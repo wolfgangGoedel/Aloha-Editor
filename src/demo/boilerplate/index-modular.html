@@ -67,14 +67,16 @@
 	-->
 	<!-- Don't commit the sourceview plugin to the list of enabled plugins! -->
 
-	<script src="../../lib/aloha.js"
+	<script>var ALOHA_BASE_URL = '../../';
+	        Aloha.deferInit = true;</script>
+	<script src="../../lib/aloha-module.js"
 	        data-aloha-plugins="common/ui,
-	                            common/format,
-	                            common/table,
-	                            common/list,
-	                            common/link,
-	                            common/highlighteditables,
-	                            common/contenthandler,
+								common/format,
+								common/table,
+								common/list,
+								common/link,
+								common/highlighteditables,
+								common/contenthandler,
 	                            common/paste,
 	                            common/characterpicker,
 	                            common/commands,
@@ -83,24 +85,24 @@
 	                            common/abbr,
 	                            common/horizontalruler,
 	                            common/align,
-	                            common/dom-to-xhtml"></script>
-	<script src="../../plugins/common/ui/lib/ui-plugin.js"></script>
-	<script src="../../plugins/common/format/lib/format-plugin.js"></script>
-	<script src="../../plugins/common/table/lib/table-plugin.js"></script>
-	<script src="../../plugins/common/list/lib/list-plugin.js"></script>
-	<script src="../../plugins/common/link/lib/link-plugin.js"></script>
-	<script src="../../plugins/common/highlighteditables/lib/highlighteditables-plugin.js"></script>
-	<script src="../../plugins/common/contenthandler/lib/contenthandler-plugin.js"></script>
-	<script src="../../plugins/common/paste/lib/paste-plugin.js"></script>
-	<script src="../../plugins/common/characterpicker/lib/characterpicker-plugin.js"></script>
-	<script src="../../plugins/common/commands/lib/commands-plugin.js"></script>
-	<script src="../../plugins/common/block/lib/block-plugin.js"></script>
-	<script src="../../plugins/common/image/lib/image-plugin.js"></script>
-	<script src="../../plugins/common/abbr/lib/abbr-plugin.js"></script>
-	<script src="../../plugins/common/horizontalruler/lib/horizontalruler-plugin.js"></script>
-	<script src="../../plugins/common/align/lib/align-plugin.js"></script>
-	<script src="../../plugins/common/dom-to-xhtml/lib/dom-to-xhtml-plugin.js"></script>
-	<script>Aloha._load();</script>
+								common/dom-to-xhtml"></script>
+	<script src="../../plugins/common/ui/lib/ui-module.js"></script>
+	<script src="../../plugins/common/format/lib/format-module.js"></script>
+	<script src="../../plugins/common/table/lib/table-module.js"></script>
+	<script src="../../plugins/common/list/lib/list-module.js"></script>
+	<script src="../../plugins/common/link/lib/link-module.js"></script>
+	<script src="../../plugins/common/highlighteditables/lib/highlighteditables-module.js"></script>
+	<script src="../../plugins/common/contenthandler/lib/contenthandler-module.js"></script>
+	<script src="../../plugins/common/paste/lib/paste-module.js"></script>
+	<script src="../../plugins/common/characterpicker/lib/characterpicker-module.js"></script>
+	<script src="../../plugins/common/commands/lib/commands-module.js"></script>
+	<script src="../../plugins/common/block/lib/block-module.js"></script>
+	<script src="../../plugins/common/image/lib/image-module.js"></script>
+	<script src="../../plugins/common/abbr/lib/abbr-module.js"></script>
+	<script src="../../plugins/common/horizontalruler/lib/horizontalruler-module.js"></script>
+	<script src="../../plugins/common/align/lib/align-module.js"></script>
+	<script src="../../plugins/common/dom-to-xhtml/lib/dom-to-xhtml-module.js"></script>
+	<script>Aloha.deferInit();</script>
 	<!-- Include the fake-jquery to make sure that Aloha works even if
 		 the user includes his own global jQuery after aloha.js. -->
 	<script src="fake-jquery.js"></script>

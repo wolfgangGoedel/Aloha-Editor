@@ -309,7 +309,7 @@
     //does not use require() in the built project or in the JS files, but you
     //still want to use the optimization tool from RequireJS to concatenate modules
     //together.
-    skipModuleInsertion: false,
+    skipModuleInsertion: true,
 
     //If it is not a one file optimization, scan through all .js files in the
     //output directory for any plugin resource dependencies, and if the plugin
@@ -339,11 +339,11 @@
         //a built file that contains all of its dependencies. If that module or any
         //of its dependencies includes i18n bundles, they may not be included in the
         //built file unless the locale: section is set above.
-        { name: "aloha",
-		  override: {
-			  alohaExclusive: "lib",
-		  },
+        { name: "aloha-module",
+		  create: true,
+		  override: { alohaExclusive: "lib", },
 		  include: [
+			  'aloha',
 			  'vendor/class',
 			  'vendor/pubsub/js/pubsub',
 			  'vendor/amplify.store',
@@ -351,11 +351,11 @@
 		  ],
 		},
 		// all common plugins
-		{ name: "ui/ui-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/ui",
-		  },
+		{ name: "ui/ui-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/ui", },
 		  include: [
+			  'ui/ui-plugin',
 			  'ui/ui',
 			  'ui/arena',
 			  'ui/autocomplete',
@@ -368,86 +368,73 @@
 			  'ui/toggleButton',
 		  ],
 		},
-		{ name: "link/link-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/link",
-		  },
+		{ name: "link/link-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/link", },
+		  include: [ 'link/link-plugin' ] },
+		{ name: "table/table-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/table", },
+		  include: [ 'table/table-plugin', ] },
+		{ name: "format/format-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/format", },
+		  include: [ 'format/format-plugin', ] },
+		{ name: "list/list-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/list", },
+		  include: [ 'list/list-plugin', ] },
+		{ name: "image/image-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/image", },
+		  include: [ 'image/image-plugin', ] },
+		{ name: "highlighteditables/highlighteditables-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/highlighteditables", },
+		  include: [ 'highlighteditables/highlighteditables-plugin', ] },
+		{ name: "dom-to-xhtml/dom-to-xhtml-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/dom-to-xhtml", },
+		  include: [ 'dom-to-xhtml/dom-to-xhtml-plugin', ] },
+		{ name: "contenthandler/contenthandler-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/contenthandler", },
+		  include: [ 'contenthandler/contenthandler-plugin', ] },
+		{ name: "characterpicker/characterpicker-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/characterpicker", },
+		  include: [ 'characterpicker/characterpicker-plugin', ]
 		},
-		{ name: "table/table-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/table",
-		  },
-		},
-		{ name: "format/format-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/format",
-		  },
-		},
-		{ name: "list/list-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/list",
-		  },
-		},
-		{ name: "image/image-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/image",
-		  },
-		},
-		{ name: "highlighteditables/highlighteditables-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/highlighteditables",
-		  },
-		},
-		{ name: "dom-to-xhtml/dom-to-xhtml-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/dom-to-xhtml",
-		  },
-		},
-		{ name: "contenthandler/contenthandler-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/contenthandler",
-		  },
-		},
-		{ name: "characterpicker/characterpicker-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/characterpicker",
-		  },
-		},
-		{ name: "commands/commands-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/commands",
-		  },
-		},
-		{ name: "block/block-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/block",
-		  },
+		{ name: "commands/commands-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/commands", },
+		  include: [ 'commands/commands-plugin', ] },
+		{ name: "block/block-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/block", },
 		  include: [
+			  'block/block-plugin',
 			  'block/editor',
 			  'block/sidebarattributeeditor',
 			  'block/blockcontenthandler',
 		  ]
 		},
-		{ name: "align/align-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/align",
-		  },
-		},
-		{ name: "abbr/abbr-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/abbr",
-		  },
-		},
-		{ name: "horizontalruler/horizontalruler-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/horizontalruler",
-		  },
-		},
-		{ name: "paste/paste-plugin",
-		  override: {
-			  alohaExclusive: "plugins/common/paste",
-		  },
-		},
+		{ name: "align/align-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/align", },
+		  include: [ 'align/align-plugin' ] },
+		{ name: "abbr/abbr-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/abbr", },
+		  include: [ 'abbr/abbr-plugin' ] },
+		{ name: "horizontalruler/horizontalruler-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/horizontalruler", },
+		  include: [ 'horizontalruler/horizontalruler-plugin' ] },
+		{ name: "paste/paste-module",
+		  create: true,
+		  override: { alohaExclusive: "plugins/common/paste", },
+		  include: [ 'paste/paste-plugin' ] },
     ],
 
 	// Custom Aloha directives interpreted only in the onBuildWrite function
@@ -461,11 +448,15 @@
 	// optimized output file. Other dependencies will simply be skipped.
 	//alohaExclusive: "path/to/dir",
 
+	// This onBuildWrite implementation implements the
+	// alohaBuildForDevMode and alohaExclusive directives. If neither
+	// alohaBuildForDevMode nor alohaExclusive are specified, will just
+	// return the unmodified contents.
 	onBuildWrite: function (moduleName, path, contents) {
 		'use strict';
 
-		// relativize("a/b/c/", "a/b/c/d/"  ) => "d"
-		// relativize("a/b/c", "a/b/c/d/e") => "d/e"
+		// relativize("a/b/c/", "a/b/c/d/" ) => "d"
+		// relativize("a/b/c" , "a/b/c/d/e") => "d/e"
 		function relativize(ancestor, descendant) {
 			ancestor = ancestor.replace(/\/$/, '');
 			descendant = descendant.replace(/\/$/, '');
@@ -476,27 +467,16 @@
 		}
 
 		// The output folder is a common ancestor of all paths
-		var outputDir = this.dir;
-		// The module file will be put in a subfolder of outputDir
-		var moduleFileOutputDir = this.dirBaseUrl;
-
-		var moduleFileLevelsDown = relativize(outputDir, moduleFileOutputDir).split("/").length;
-		var dotsToOutputDir = "";
-		for (var i = 0; i < moduleFileLevelsDown; i++) {
-			dotsToOutputDir += '../';
-		}
-
+		var outputDir = this.dir.replace(/\/$/, '');
 		var relFromOutputDir = relativize(outputDir, path);
-		var relFromModuleFileOutputDir = dotsToOutputDir + relFromOutputDir;
 
-		if (this.alohaBuildForDevMode) {
-			return 'document.write(\'<script src="' + relFromModuleFileOutputDir + '"></script>\');';
-		} else {
-			if (this.alohaExclusive && this.alohaExclusive + "/" !== relFromOutputDir.substring(0, this.alohaExclusive.length + 1)) {
-				return '';
-			}
-			return contents;
+		if (this.alohaExclusive && this.alohaExclusive + "/" !== relFromOutputDir.substring(0, this.alohaExclusive.length + 1)) {
+			return '';
 		}
+		if (this.alohaBuildForDevMode) {
+			return 'document.write(\'<script src="\' + ALOHA_BASE_URL + \'' + relFromOutputDir + '"></script>\');';
+		}
+		return contents;
 	},
 
     //Another way to use wrap, but uses file paths. This makes it easier
