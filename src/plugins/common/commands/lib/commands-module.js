@@ -1,0 +1,20 @@
+
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+document.write('<script src="' + ALOHA_BASE_URL + 'plugins/common/commands/lib/inserthtml.js"></script>');
+document.write('<script src="' + ALOHA_BASE_URL + 'plugins/common/commands/lib/commands-plugin.js"></script>');
