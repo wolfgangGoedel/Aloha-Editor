@@ -276,3 +276,7 @@ Sanitize.prototype.clean_node = function(container) {
   return fragment;
   
 }
+
+if (window.define) {
+	define('vendor/sanitize', [], function () {});
+}
