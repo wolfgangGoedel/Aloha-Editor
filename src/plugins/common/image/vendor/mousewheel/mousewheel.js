@@ -9,7 +9,7 @@
  * 
  * Requires: 1.2.2+
  */
-define(['jquery'],function(jQuery){
+define('image/vendor/mousewheel/mousewheel', ['jquery'],function(jQuery){
 (function($) {
 
 var types = ['DOMMouseScroll', 'mousewheel'];

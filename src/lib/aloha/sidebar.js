@@ -29,7 +29,7 @@
  *        - Make overlayPage setting settable from external config.
  */
 
-define([
+define('aloha/sidebar', [
     'aloha/core',
     'jquery',
     'aloha/selection',

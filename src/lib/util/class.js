@@ -9,7 +9,7 @@
  * * Mixin Support using https://gist.github.com/1006243
  * * Modified to be a require.js module
  */
-define(
+define('util/class',
 [],
 function(){
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;

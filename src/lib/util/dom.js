@@ -28,7 +28,7 @@
 GENTICS = window.GENTICS || {};
 GENTICS.Utils = GENTICS.Utils || {};
 
-define(
+define('util/dom',
 ['jquery', 'util/class', 'aloha/ecma5shims'],
 function(jQuery, Class, $_) {
 	"use strict";

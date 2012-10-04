@@ -1,4 +1,4 @@
-define(//['aloha/ecma5'],
+define('aloha/engine',
 ['aloha/ecma5shims', 'jquery'],
 function($_, jQuery) {
 	"use strict";

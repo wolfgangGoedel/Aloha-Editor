@@ -1,4 +1,4 @@
-define(
+define('table/table-create-layer',
 ['jquery'],
 function (jQuery) {
 	/**

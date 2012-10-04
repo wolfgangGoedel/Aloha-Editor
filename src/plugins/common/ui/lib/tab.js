@@ -1,4 +1,4 @@
-define([
+define('ui/tab', [
 	'aloha/core',
 	'jquery',
 	'ui/container',

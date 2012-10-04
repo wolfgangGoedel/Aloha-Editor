@@ -20,7 +20,7 @@
  * @todo: - selectRow/selectColumn should take into account the helper row/column.
  *			ie: selectRow(0) and selectColumn(0), should be zero indexed
  */
-define([
+define('table/table', [
 	'aloha',
 	'jquery',
 	'ui/scopes',

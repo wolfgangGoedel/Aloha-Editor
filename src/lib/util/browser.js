@@ -24,7 +24,7 @@
  * provided you include this license notice and a URL through which
  * recipients can access the Corresponding Source.
  */
-define(['jquery'], function ($) {
+define('util/browser', ['jquery'], function ($) {
 	'use strict';
     return {
 		ie7: $.browser.msie && parseInt($.browser.version, 10) < 8

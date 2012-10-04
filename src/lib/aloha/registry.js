@@ -30,7 +30,7 @@
  * TODO: document that it also contains Observable.
  *
  */
-define(
+define('aloha/registry',
 ['jquery', 'aloha/observable', 'util/class'],
 function (jQuery, Observable, Class) {
 	"use strict";

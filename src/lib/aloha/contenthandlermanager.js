@@ -25,7 +25,7 @@
  * recipients can access the Corresponding Source.
  */
 /*global define:true */
-define(
+define('aloha/contenthandlermanager',
 ['jquery', 'aloha/registry', 'util/class', 'aloha/console'],
 function (jQuery, Registry, Class, console) {
 	"use strict";

@@ -18,7 +18,7 @@
  * constant lookup times when grouping containers.
  */
 
-define([
+define('ui/container', [
 	'jquery',
 	'util/class',
 	'ui/scopes'

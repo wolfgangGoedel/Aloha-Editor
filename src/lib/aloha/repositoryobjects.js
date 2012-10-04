@@ -24,7 +24,7 @@
  * provided you include this license notice and a URL through which
  * recipients can access the Corresponding Source.
  */
-define(
+define('aloha/repositoryobjects',
 [ 'aloha/core', 'util/class'],
 function( Aloha, Class ) {
 	"use strict";

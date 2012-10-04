@@ -24,7 +24,7 @@
  * provided you include this license notice and a URL through which
  * recipients can access the Corresponding Source.
  */
-define(
+define('contenthandler/genericcontenthandler',
 ['aloha', 'jquery', 'aloha/contenthandlermanager'],
 function(Aloha, jQuery, ContentHandlerManager) {
 	"use strict";

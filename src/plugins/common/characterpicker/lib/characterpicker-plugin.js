@@ -6,7 +6,7 @@
 * aloha-sales@gentics.com
 * Licensed unter the terms of http://www.aloha-editor.com/license.html
 */
-define([
+define('characterpicker/characterpicker-plugin', [
 	'aloha', 
 	'jquery', 
 	'aloha/plugin', 

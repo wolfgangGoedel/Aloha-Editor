@@ -24,14 +24,10 @@
  * provided you include this license notice and a URL through which
  * recipients can access the Corresponding Source.
  */
-define(
-
-[
+define('aloha/core', [
 	'jquery',
 	'aloha/pluginmanager'
-],
-
-function ( jQuery, PluginManager ) {
+], function ( jQuery, PluginManager ) {
 	"use strict";
 
 	//----------------------------------------

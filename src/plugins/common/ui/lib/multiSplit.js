@@ -3,7 +3,7 @@
  * The multiSplit component groups multiple buttons and other
  * button-like items into an expandable menu.
  */
-define([
+define('ui/multiSplit', [
 	'jquery',
 	'ui/component',
 	'ui/button',

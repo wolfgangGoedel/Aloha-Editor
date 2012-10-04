@@ -25,7 +25,7 @@
  * recipients can access the Corresponding Source.
  */
 "use strict";
-define( [ 'aloha/core', 'aloha/registry', 'aloha/engine', 'util/dom', 'aloha/contenthandlermanager' ],
+define('aloha/command', [ 'aloha/core', 'aloha/registry', 'aloha/engine', 'util/dom', 'aloha/contenthandlermanager' ],
 function( Aloha, Registry, Engine, Dom, ContentHandlerManager ) {
 
 //			Action: What the command does when executed via execCommand(). Every command defined

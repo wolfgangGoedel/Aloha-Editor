@@ -24,7 +24,7 @@
  * provided you include this license notice and a URL through which
  * recipients can access the Corresponding Source.
  */
-define(['jquery', 'util/maps', 'util/strings', 'util/browser'], function ($, Maps, Strings, Browser) {
+define('util/dom2', ['jquery', 'util/maps', 'util/strings', 'util/browser'], function ($, Maps, Strings, Browser) {
 	
 	var spacesRx = /\s+/;
 	var attrRegex = /\s([^<\s=]+)(?:=(?:"[^"]*"|'[^']*'|[^\s]+))?/g;

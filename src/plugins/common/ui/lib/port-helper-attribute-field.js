@@ -3,7 +3,7 @@
  * ui-attributefield.js in the aloha core to the new ui-plugin.
  * This interface is obsolete and must not be used for new implementations.
  */
-define([
+define('ui/port-helper-attribute-field', [
 	'jquery',
 	'ui/ui',
 	'ui/component',

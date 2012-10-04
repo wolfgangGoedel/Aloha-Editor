@@ -1,4 +1,4 @@
-define([
+define('ui/autocomplete', [
 	'jquery',
 	'aloha/repositorymanager',
 	'ui/component',

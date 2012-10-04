@@ -61,7 +61,7 @@
  *       content - similar to make clean, but for single elements to reduce
  *       overhead.
  */
-define([
+define('aloha/ephemera', [
 	'jquery',
 	'aloha/core',
 	'aloha/console',

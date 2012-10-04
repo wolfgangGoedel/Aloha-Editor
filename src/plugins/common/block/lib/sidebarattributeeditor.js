@@ -24,7 +24,7 @@
  * provided you include this license notice and a URL through which
  * recipients can access the Corresponding Source.
  */
-define([ 'jquery', 'block/blockmanager', 'aloha/sidebar', 'block/editormanager', 'util/class'],
+define('block/sidebarattributeeditor', [ 'jquery', 'block/blockmanager', 'aloha/sidebar', 'block/editormanager', 'util/class'],
 	function (jQuery, BlockManager, Sidebar, EditorManager, Class) {
 	"use strict";
 

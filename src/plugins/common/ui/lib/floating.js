@@ -1,4 +1,4 @@
-define([
+define('ui/floating', [
 	'jquery',
 	'aloha/core',
 	'ui/surface',

@@ -1,4 +1,4 @@
-define(
+define('table/table-selection',
 ['aloha',
  'jquery',
  'table/table-plugin-utils',

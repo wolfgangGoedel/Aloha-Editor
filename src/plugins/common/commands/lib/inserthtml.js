@@ -24,7 +24,7 @@
  * provided you include this license notice and a URL through which
  * recipients can access the Corresponding Source.
  */
-define(
+define('commands/inserthtml',
 ['aloha/core', 'jquery', 'aloha/command', 'aloha/selection', 'util/dom', 'aloha/contenthandlermanager', 'aloha/console'],
 function(Aloha, jQuery, command, selection, dom, ContentHandlerManager, console) {
 	"use strict";

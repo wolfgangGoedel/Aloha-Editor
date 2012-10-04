@@ -24,7 +24,7 @@
  * provided you include this license notice and a URL through which
  * recipients can access the Corresponding Source.
  */
-define(
+define('undo/undo-plugin',
 ['aloha', 'jquery', 'aloha/plugin', 'undo/vendor/undo', 'undo/vendor/diff_match_patch_uncompressed'],
 function( Aloha, jQuery, Plugin) {
 	"use strict";

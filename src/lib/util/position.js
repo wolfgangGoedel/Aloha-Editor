@@ -28,7 +28,7 @@
 // Ensure GENTICS Namespace
 GENTICS = window.GENTICS || {};
 GENTICS.Utils = GENTICS.Utils || {};
-define(['jquery'],
+define('util/position', ['jquery'],
 function(jQuery) {
 	"use strict";
 	

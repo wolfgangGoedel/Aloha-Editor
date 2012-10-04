@@ -25,7 +25,7 @@
  * recipients can access the Corresponding Source.
  */
 // Do not add dependencies that require depend on aloha/core
-define(
+define('aloha/pluginmanager',
 [ 'jquery', 'util/class' ],
 function( jQuery, Class ) {
 	"use strict";

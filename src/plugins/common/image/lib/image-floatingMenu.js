@@ -7,7 +7,7 @@
  * 
  * Author : Nicolas Karageuzian - http://nka.me
  */
-define([
+define('image/image-floatingMenu', [
 	'jquery',
     'util/class',
 	'i18n!image/nls/i18n',

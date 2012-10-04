@@ -17,7 +17,7 @@
 * Licensed under the terms of http://www.aloha-editor.com/license.html
 */
 
-define([
+define('image/image-plugin', [
 	// js
 	'jquery',
 	'aloha/plugin',

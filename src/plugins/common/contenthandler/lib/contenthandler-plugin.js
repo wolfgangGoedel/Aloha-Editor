@@ -10,7 +10,7 @@
  * @name contenthandler
  * @namespace Content handler plugin
  */
-define([
+define('contenthandler/contenthandler-plugin', [
 	'aloha',
 	'aloha/plugin',
 	'jquery',

@@ -1,4 +1,4 @@
-define({
+define('format/nls/i18n', {
 	root: {
 		"button.strong.tooltip":"Strong",
 		"button.em.tooltip":"Emphasize",

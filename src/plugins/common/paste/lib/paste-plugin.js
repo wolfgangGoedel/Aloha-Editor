@@ -33,7 +33,7 @@
  * before being copied into the active editable, at the current range.
  */
 
-define(
+define('paste/paste-plugin',
 [ 'aloha/core', 'aloha/plugin', 'jquery', 'aloha/command',
   'aloha/console' ],
 function ( Aloha, Plugin, jQuery, Commands, console ) {

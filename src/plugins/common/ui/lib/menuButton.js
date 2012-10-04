@@ -1,4 +1,4 @@
-define([
+define('ui/menuButton', [
 	'jquery',
 	'ui/component',
 	'ui/utils',

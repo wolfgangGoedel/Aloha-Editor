@@ -27,7 +27,7 @@
 /**
  * Provides public utility methods to convert DOM nodes to XHTML.
  */
-define([
+define('dom-to-xhtml/dom-to-xhtml', [
 	'jquery',
 	'util/dom2',
 	'util/misc',

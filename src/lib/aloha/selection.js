@@ -25,7 +25,7 @@
  * recipients can access the Corresponding Source.
  */
 "use strict";
-define(
+define('aloha/selection',
 [ 'aloha/core', 'jquery', 'util/class', 'util/range', 'util/arrays', 'util/strings', 'aloha/console', 'PubSub', 'aloha/engine', 'aloha/ecma5shims', 'aloha/rangy-core' ],
 function(Aloha, jQuery, Class, Range, Arrays, Strings, console, PubSub, Engine, e5s) {
 	var GENTICS = window.GENTICS;

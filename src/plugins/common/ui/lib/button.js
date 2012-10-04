@@ -4,7 +4,7 @@
  *    component (this.element = this.buttonElement)?
  */
 
-define([
+define('ui/button', [
 	'jquery',
 	'ui/component',
 	'ui/utils',

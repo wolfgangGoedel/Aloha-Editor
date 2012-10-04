@@ -1,4 +1,4 @@
-define(
+define('table/table-cell',
 ['jquery', 'table/table-plugin-utils'],
 function (jQuery, Utils) {
 	/**

@@ -30,7 +30,7 @@
  * Instead use the define(...) mechanism to define a module and to
  * import it where you need it.
  */
-define([
+define('aloha/jquery.aloha', [
 	'aloha/core',
 	'aloha/selection',
 	'jquery',

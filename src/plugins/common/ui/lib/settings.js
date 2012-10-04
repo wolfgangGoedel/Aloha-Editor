@@ -1,4 +1,4 @@
-define(['jquery', 'util/arrays', 'util/maps', 'util/trees'], function($, Arrays, Maps, Trees){
+define('ui/settings', ['jquery', 'util/arrays', 'util/maps', 'util/trees'], function($, Arrays, Maps, Trees){
 	var defaultToolbarSettings = {
 		tabs: [
 			// Format Tab

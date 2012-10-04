@@ -32,7 +32,7 @@
  * Clicking on any links inside the editable activates the this plugin's
  * floating menu scope.
  */
-define( [
+define('link/link-plugin', [
 	'aloha',
 	'aloha/plugin',
 	'aloha/ephemera',

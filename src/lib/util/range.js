@@ -28,7 +28,7 @@
 GENTICS = window.GENTICS || {};
 GENTICS.Utils = GENTICS.Utils || {};
 
-define(
+define('util/range',
 ['jquery', 'util/dom', 'util/class', 'aloha/console', 'aloha/rangy-core'],
 function(jQuery, Dom, Class, console, rangy) {
 	"use strict";

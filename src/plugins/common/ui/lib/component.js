@@ -1,4 +1,4 @@
-define([
+define('ui/component', [
 	'aloha/core',
 	'jquery',
 	'util/class'

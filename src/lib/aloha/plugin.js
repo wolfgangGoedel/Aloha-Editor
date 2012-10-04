@@ -24,7 +24,7 @@
  * provided you include this license notice and a URL through which
  * recipients can access the Corresponding Source.
  */
-define(
+define('aloha/plugin',
 ['aloha/core', 'jquery', 'util/class', 'aloha/pluginmanager', 'aloha/console'],
 function(Aloha, jQuery, Class, PluginManager, console ) {
 	"use strict";

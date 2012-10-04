@@ -1,4 +1,4 @@
-define([
+define('ui/surface', [
 	'aloha/core',
 	'jquery',
 	'util/class',

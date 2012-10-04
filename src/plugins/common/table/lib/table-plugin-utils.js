@@ -1,4 +1,4 @@
-define(
+define('table/table-plugin-utils',
 ['jquery'],
 function ($) {
 	var Utils = {

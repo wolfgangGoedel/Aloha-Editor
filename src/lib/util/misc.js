@@ -27,7 +27,7 @@
 /**
  * Contains miscellaneous utility functions that don't fit anywhere else.
  */
-define([], function () {
+define('util/misc', [], function () {
 	'use strict';
 
 	/**

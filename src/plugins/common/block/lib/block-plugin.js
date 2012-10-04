@@ -28,7 +28,7 @@
  * @name block
  * @namespace Block plugin
  */
-define([
+define('block/block-plugin', [
 	'aloha',
 	'aloha/plugin',
 	'jquery',

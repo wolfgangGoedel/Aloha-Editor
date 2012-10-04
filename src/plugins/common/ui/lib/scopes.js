@@ -1,4 +1,4 @@
-define([
+define('ui/scopes', [
 	'jquery',
 	'PubSub'
 ], function (

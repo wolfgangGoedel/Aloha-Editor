@@ -40,7 +40,7 @@
  * TODO: this file currently doesn't contain all the code to implement
  *       block jumping. Some of it is currently implemented in markup.js.
  */
-define(['aloha/core', 'jquery'], function(Aloha, $){
+define('aloha/block-jump', ['aloha/core', 'jquery'], function(Aloha, $){
 
 	var zeroWidthNode = null;
 

@@ -1,4 +1,4 @@
-define([
+define('ui/toolbar', [
 	'jquery',
 	'aloha/core',
 	'ui/surface',

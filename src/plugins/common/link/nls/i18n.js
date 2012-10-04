@@ -1,4 +1,4 @@
-define({
+define('link/nls/i18n', {
 	root: {
 		'button.addlink.tooltip': 'Insert Link',
 		'button.removelink.tooltip': 'Remove Link',

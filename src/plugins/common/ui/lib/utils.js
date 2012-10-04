@@ -24,7 +24,7 @@
  * provided you include this license notice and a URL through which
  * recipients can access the Corresponding Source.
  */
-define(['jquery', 'jqueryui'], function ($) {
+define('ui/utils', ['jquery', 'jqueryui'], function ($) {
 	'use strict';
 
 	/**

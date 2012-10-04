@@ -1,4 +1,4 @@
-define({
+define('ui/nls/i18n', {
 	root: {
 		// format
 		"button.bold.label": "Bold",

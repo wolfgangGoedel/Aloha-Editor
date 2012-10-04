@@ -1,4 +1,4 @@
-define([
+define('ui/subguarded', [
 	'aloha/core',
 	'jquery',
 	'PubSub'

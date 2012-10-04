@@ -30,7 +30,7 @@
  * (in so far as the DOM of the editables itself is valid).
  * Attributes described by Ehpemera.ephemera() will be removed.
  */
-define([
+define('dom-to-xhtml/dom-to-xhtml-plugin', [
 	'aloha',
 	'jquery',
 	'aloha/plugin',

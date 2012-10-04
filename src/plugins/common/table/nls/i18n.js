@@ -1,4 +1,4 @@
-define({
+define('table/nls/i18n', {
     root: {
         "floatingmenu.tab.table": "Table",
         "floatingmenu.tab.tablelayout": "Table Layout",

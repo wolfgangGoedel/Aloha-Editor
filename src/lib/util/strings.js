@@ -24,7 +24,7 @@
  * provided you include this license notice and a URL through which
  * recipients can access the Corresponding Source.
  */
-define(['jquery'], function ($) {
+define('util/strings', ['jquery'], function ($) {
 	'use strict';
 
 	var spacesRx = /\s+/;

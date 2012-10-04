@@ -1,4 +1,4 @@
-define( {
+define('aloha/nls/i18n', {
 	'root':  {
 		'plugin.abbr.floatingmenu.tab.abbr': 'Abbreviation',
 		'floatingmenu.tab.format': 'Format',

@@ -13,7 +13,7 @@
  * 2 - all css rules should have a .aloha context class, and the common
  *     parent provides this class.
  */
-define([
+define('ui/context', [
 	'aloha',
 	'jquery',
 	'util/class'

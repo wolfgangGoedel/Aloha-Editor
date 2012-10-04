@@ -1,4 +1,4 @@
-define([
+define('ui/toggleButton', [
 	'jquery',
 	'ui/button',
 	'jqueryui'

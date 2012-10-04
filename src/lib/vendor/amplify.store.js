@@ -1,4 +1,4 @@
-define(['util/json2'],function(){
+define('vendor/amplify.store', ['util/json2'],function(){
 var amplify = {};
 
 /*!

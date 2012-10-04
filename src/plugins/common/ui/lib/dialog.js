@@ -1,4 +1,4 @@
-define([
+define('ui/dialog', [
 	'jquery',
 	'ui/component'
 ],
