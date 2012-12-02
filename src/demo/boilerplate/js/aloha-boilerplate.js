@@ -1,5 +1,5 @@
 // The linklist povides example search results for the link plugin input field
-Aloha.require(['aloha', 'aloha/jquery', '../plugins/common/link/extra/linklist'], function( Aloha, $) {
+Aloha.require(['aloha', 'aloha/jquery'], function( Aloha, $) {
 	$.fn.alohaStage = function() {
 		var switcher = this.find('ul.stage-switcher'),
 		me = this,

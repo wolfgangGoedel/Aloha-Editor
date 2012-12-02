@@ -30,9 +30,9 @@ define('contenthandler/sanitizecontenthandler', [
 	'aloha/contenthandlermanager',
 	'aloha/plugin',
 	'aloha/console',
-	'vendor/sanitize'
+	'contenthandler/vendor/sanitize'
 ],
-function( Aloha, jQuery, ContentHandlerManager, Plugin, console ) {
+function( Aloha, jQuery, ContentHandlerManager, Plugin, console, Sanitize ) {
 	"use strict";
 	
 	var sanitize;

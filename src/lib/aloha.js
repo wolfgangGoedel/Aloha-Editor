@@ -24,6 +24,7 @@
  * provided you include this license notice and a URL through which
  * recipients can access the Corresponding Source.
  */
+var define, require;
 (function (global) {
 	'use strict';
 
@@ -199,7 +200,10 @@
 		});
 	}
 
+	var myrequire = require, mydefine = define;
+
 	function load() {
+		var require = myrequire, define = mydefine;
 
 		Aloha.defaults = {};
 		Aloha.settings = Aloha.settings || {};
@@ -241,9 +245,15 @@
 		 */
 		var moduleMap = mergeObjects(coreMap, pluginConfig.map)
 
+		// The defaultLocale must be the same here and in the build-modular.js profile.
+		var defaultLocale = 'en';
 		var defaultConfig = {
 			context: 'aloha',
-			locale: Aloha.settings.locale || 'en',
+			config: {
+				i18n: {
+					locale: Aloha.settings.locale || defaultLocale
+				}
+			},
 			baseUrl: Aloha.settings.baseUrl,
 			map: moduleMap
 		};
@@ -381,6 +391,12 @@
 			// jQuery may have been redefined by a user's jQuery.
 			return jQueryThatWasPassedToUs || jQuery;
 		});
+
+		// If there is already a jquery ui, use it instead of loading
+		// our own, which would overwrite it and probably cause errors.
+		if (jQueryThatWasPassedToUs && jQueryThatWasPassedToUs.ui) {
+			define('jqueryui', jQueryThatWasPassedToUs.ui);
+		}
 
 		// Initialize this early so that the user doesn't have to use
 		// Aloha.ready().

@@ -53,14 +53,6 @@
 		It can also be placed inline here before loading Aloha Editor itself.
 	-->
 	<script src="js/aloha-config.js"></script>
-	<script src="../../lib/require.js"></script>
-	<script src="../../lib/vendor/jquery-1.7.2.js"></script>
-    <script>
-	  // Passing jQuery into Aloha explicitly is not necessary since
-	  // newer versions of jQuery will make a call to define which will
-	  // be picked up in aloha.js
-	  //Aloha.settings.jQuery = $.noConflict(true);
-    </script>
 	<!--
 		Load the Aloha Editor library.
 		The plugin list could also be added to the configuration.
@@ -68,10 +60,15 @@
 	<!-- Don't commit the sourceview plugin to the list of enabled plugins! -->
 
 	<script>var ALOHA_BASE_URL = '../../';
+//            Aloha.settings.locale = 'de';
 	        Aloha.deferInit = true;</script>
-	<script src="../../lib/aloha-module.js"
+	<script src="../../lib/aloha-core.js"></script>
+	<script src="../../lib/vendor/jquery-1.7.2.js"></script>
+	<script src="../../lib/vendor/jquery-ui-1.9m6.js"></script>
+
+<!--
 	        data-aloha-plugins="common/ui,
-								common/format,
+								common/format
 								common/table,
 								common/list,
 								common/link,
@@ -85,29 +82,47 @@
 	                            common/abbr,
 	                            common/horizontalruler,
 	                            common/align,
-								common/dom-to-xhtml"></script>
-	<script src="../../plugins/common/ui/lib/ui-module.js"></script>
-	<script src="../../plugins/common/format/lib/format-module.js"></script>
-	<script src="../../plugins/common/table/lib/table-module.js"></script>
-	<script src="../../plugins/common/list/lib/list-module.js"></script>
-	<script src="../../plugins/common/link/lib/link-module.js"></script>
-	<script src="../../plugins/common/highlighteditables/lib/highlighteditables-module.js"></script>
-	<script src="../../plugins/common/contenthandler/lib/contenthandler-module.js"></script>
-	<script src="../../plugins/common/paste/lib/paste-module.js"></script>
-	<script src="../../plugins/common/characterpicker/lib/characterpicker-module.js"></script>
-	<script src="../../plugins/common/commands/lib/commands-module.js"></script>
-	<script src="../../plugins/common/block/lib/block-module.js"></script>
-	<script src="../../plugins/common/image/lib/image-module.js"></script>
-	<script src="../../plugins/common/abbr/lib/abbr-module.js"></script>
-	<script src="../../plugins/common/horizontalruler/lib/horizontalruler-module.js"></script>
-	<script src="../../plugins/common/align/lib/align-module.js"></script>
-	<script src="../../plugins/common/dom-to-xhtml/lib/dom-to-xhtml-module.js"></script>
+								common/dom-to-xhtml"
+-->
+<!--
+	<script src="../../lib/aloha/nls/de/i18n.js"></script>
+	<script src="../../plugins/common/ui/nls/de/i18n.js"></script>
+	<script src="../../plugins/common/format/nls/de/i18n.js"></script>
+	<script src="../../plugins/common/horizontalruler/nls/de/i18n.js"></script>
+	<script src="../../plugins/common/abbr/nls/de/i18n.js"></script>
+	<script src="../../plugins/common/image/nls/de/i18n.js"></script>
+	<script src="../../plugins/common/characterpicker/nls/de/i18n.js"></script>
+	<script src="../../plugins/common/link/nls/de/i18n.js"></script>
+	<script src="../../plugins/common/list/nls/de/i18n.js"></script>
+	<script src="../../plugins/common/table/nls/de/i18n.js"></script>
+-->
+	<script src="../../plugins/common/ui/ui.js"></script>
+	<script src="../../plugins/common/format/format.js"></script>
+	<script src="../../plugins/common/table/table.js"></script>
+	<script src="../../plugins/common/list/list.js"></script>
+	<script src="../../plugins/common/link/link.js"></script>
+	<script src="../../plugins/common/highlighteditables/highlighteditables.js"></script>
+	<script src="../../plugins/common/contenthandler/contenthandler.js"></script>
+	<script src="../../plugins/common/paste/paste.js"></script>
+	<script src="../../plugins/common/characterpicker/characterpicker.js"></script>
+	<script src="../../plugins/common/commands/commands.js"></script>
+	<script src="../../plugins/common/block/block.js"></script>
+	<script src="../../plugins/common/image/image.js"></script>
+	<script src="../../plugins/common/abbr/abbr.js"></script>
+	<script src="../../plugins/common/horizontalruler/horizontalruler.js"></script>
+	<script src="../../plugins/common/align/align.js"></script>
+	<script src="../../plugins/common/dom-to-xhtml/dom-to-xhtml.js"></script>
+    <script>Aloha.settings.jQuery = $.noConflict(true);</script>
+
 	<script>Aloha.deferInit();</script>
+
 	<!-- Include the fake-jquery to make sure that Aloha works even if
 		 the user includes his own global jQuery after aloha.js. -->
-	<script src="fake-jquery.js"></script>
+	<!-- <script src="fake-jquery.js"></script> -->
     <script src="ribbon-example.js"></script>
 	<link rel="stylesheet" href="css/style.css">
+
+	<!-- <script data-gg-define="linklist" src="../../plugins/common/link/extra/linklist.js"></script> -->
 	<script src="js/aloha-boilerplate.js"></script>
 </head>
 <body>

@@ -1,4 +1,272 @@
-({
+(function () {
+	'use strict';
+
+	// Depends on global fs object provided by requirejs which is
+	// equivalent to the following nodejs code (which doesn't work here
+	// for some reason).
+	//var fs = require('fs');
+
+	var devMode = -1 !== process.argv.indexOf('alohaBuildForDevMode=true');
+
+	var appDir = "../../src/";
+
+	// This list is the same as in util/aloha-define-plugin.js
+	var alohaPlugins = [
+		'common/ui',
+		'common/link',
+		'common/table',
+		'common/list',
+		'common/image',
+		'common/highlighteditables',
+		'common/format',
+		'common/dom-to-xhtml',
+		'common/contenthandler',
+		'common/characterpicker',
+		'common/commands',
+		'common/align',
+		'common/abbr',
+		'common/block',
+		'common/horizontalruler',
+		'common/undo',
+		'common/paste',
+		'extra/cite',
+		'extra/flag-icons',
+		'extra/numerated-headers',
+		'extra/formatlesspaste',
+		'extra/linkbrowser',
+		'extra/imagebrowser',
+		'extra/ribbon',
+		'extra/toc',
+		'extra/wai-lang',
+		'extra/headerids',
+		'extra/metaview',
+		'extra/listenforcer'
+	];
+
+	var paths = {
+		// These paths are the same setup as in aloha.js.
+
+		// We don't include Aloha's patched jquery by default, the user
+		// should do it himself.
+		'jquery': 'empty:',
+    	//'jquery': 'vendor/jquery-1.7.2',
+
+		// We don't include jquery-ui either, the user should do it himself.
+		'jqueryui': 'empty:',
+		//'jqueryui': 'vendor/jquery-ui-1.9m6',
+
+		// For the repository browser
+		'PubSub': 'vendor/pubsub/js/pubsub-unminified',
+		'Class': 'vendor/class',
+		'RepositoryBrowser': 'vendor/repository-browser/js/repository-browser-unminified',
+		'jstree': 'vendor/jquery.jstree',              // Mutates jquery
+		'jqgrid': 'vendor/jquery.jqgrid',              // Mutates jquery
+		'jquery-layout': 'vendor/jquery.layout',     // Mutates jquery
+		'jqgrid-locale-en': 'vendor/grid.locale.en', // Mutates jqgrid
+		'jqgrid-locale-de': 'vendor/grid.locale.de', // Mutates jqgrid
+		'repository-browser-i18n-de': 'vendor/repository-browser/js/repository-browser-unminified',
+		'repository-browser-i18n-en': 'vendor/repository-browser/js/repository-browser-unminified',
+	};
+
+	var modules = [];
+
+	var additionalIncludes = {
+		'common/block': [
+			'block/block-plugin',
+			'block/editor',
+			'block/sidebarattributeeditor',
+			'block/blockcontenthandler',
+		],
+		'common/ui': [
+			'ui/ui-plugin',
+			'ui/ui',
+			'ui/arena',
+			'ui/autocomplete',
+			'ui/dialog',
+			'ui/menuButton',
+			'ui/multiSplit',
+			'ui/port-helper-attribute-field',
+			'ui/port-helper-multi-split',
+			'ui/text',
+			'ui/toggleButton',
+		],
+		'common/contenthandler': [
+			'contenthandler/vendor/sanitize'
+		]
+	};
+
+	var coreIncludes = [
+		// Rrequirejs i18n loader plugin.
+		'i18n',
+		'aloha',
+		'vendor/class',
+		'vendor/pubsub/js/pubsub',
+		'vendor/amplify.store'
+	];
+
+	// Because aloha should work without having to worry about including
+	// i18n files, a default language should be included. Since the root
+	// i18n file is alread in english (and the root file has to be
+	// included otherwise nothing works), we also load the en specific
+	// i18n files by default (which are very few - only block and align
+	// plugin have separate en specific files).
+	// This must be the same here and in aloha.js.
+	var defaultLocale = 'en';
+
+	/**
+	 * This onBuildWrite implementation implements the
+	 * alohaBuildForDevMode, alohaExclusive, alohaExclude directives. If
+	 * non of these are specified, will just return the unmodified
+	 * contents.
+	 *
+	 * alohaBuildForDevMode: true,
+	 * If true, will output document.write(...) directives such that the
+	 * original unconcatenated files are loaded, so they can be
+	 * debugged.
+	 *
+	 * alohaExclusive: "path/to/dir",
+	 * If set, only files under this path will be included in the
+	 * optimized output file. Other dependencies will simply be skipped.
+	 *
+	 * alohaExclude: "path/to/dir",
+	 * If set, any files in under this path will be excluded.
+	 */
+	function onBuildWrite(moduleName, path, contents) {
+		// relativize("a/b/c/", "a/b/c/d/" ) => "d"
+		// relativize("a/b/c" , "a/b/c/d/e") => "d/e"
+		function relativize(ancestor, descendant) {
+			ancestor = ancestor.replace(/\/$/, '');
+			descendant = descendant.replace(/\/$/, '');
+			if (ancestor + '/' !== descendant.substring(0, ancestor.length + 1)) {
+				throw "Expected `" + ancestor + "' to be a ancestor of `" + descendant + "'";
+			}
+			return descendant.substring(ancestor.length + 1);
+		}
+
+		// The output folder is a common ancestor of all paths
+		var outputDir = this.dir.replace(/\/$/, '');
+		var relFromOutputDir = relativize(outputDir, path);
+
+		if (this.alohaExclusive && this.alohaExclusive + "/" !== relFromOutputDir.substring(0, this.alohaExclusive.length + 1)) {
+			// Because this module is excluded via the alohaExlusive
+			// directive and must not be concatenated into the currently
+			// optimized module.
+			return '';
+		}
+		if (this.alohaBuildForDevMode) {
+			// Because during dev mode we don't want to concatenate
+			// modules, but instead load them from the original
+			// location.
+			// The global define variable will be restored by
+			// aloha-define-restore.js.
+			return 'define = window.Aloha.define;'
+				+ 'document.write(\'<script data-gg-define="' + moduleName + '" src="\' + ALOHA_BASE_URL + \'' + relFromOutputDir + '"></script>\');';
+		}
+		if (this.alohaNamespace) {
+			// requirejs has a feature called 'namespace' which does too
+			// much however since it would also namespace global
+			// variables, but we only want to namespace defines.
+			return contents.replace(/^(\s*)define\(/m, '$1Aloha.define(');
+		}
+		// Because, unless this module is excluded or dev mode is on,
+		// both of which are handled above, no special handling is
+		// necessary.
+		return contents;
+	}
+
+	function includeI18nIfExists(module, path, prefix, includes) {
+		// __dirname is equal to the folder r.js resides in.
+		var i18nDir = __dirname + '/aloha/' + appDir + 'lib/' + prefix;
+		// Because if we include non-existing files, r.js will throw an error.
+		if (fs.existsSync(i18nDir + path + '.js')) {
+			includes.push(module + path);
+		}
+	}
+
+	function eachPlugin(fn) {
+		for (var i = 0; i < alohaPlugins.length; i++) {
+			var parts = alohaPlugins[i].split('/');
+			var bundle = parts[0];
+			var plugin = parts[1];
+			var prefix = '../plugins/' + bundle + '/' + plugin;
+			fn(plugin, bundle, prefix);
+		}
+	}
+
+	// Because aloha has shortcut paths for every plugin.
+	eachPlugin(function (plugin, bundle, prefix) {
+		paths[plugin] = prefix + '/lib';
+		paths[plugin + '/nls'] = prefix + '/nls';
+		paths[plugin + '/res'] = prefix + '/res';
+		paths[plugin + '/css'] = prefix + '/css';
+		paths[plugin + '/vendor'] = prefix + '/vendor';
+	});
+
+
+	// Almond provides the require() implementation and enough of the
+	// requirejs API to load loader plugins like the i18n plugin.
+	// aloha-define-plugin.js provides plugin autoload functionality.
+	var defineIncludes = ['vendor/almond', 'aloha-define-plugin'];
+	if (devMode) {
+		// gg-define-anon provides a wrapper that names anonymous modules.
+		// Because requirejs will name modules during compilation,
+		// this is only required in dev mode.
+		defineIncludes.push('vendor/gg-define-anon');
+	}
+	// aloha-define.js provides Aloha.define.
+	defineIncludes.push('aloha-define');
+	coreIncludes = defineIncludes.concat(coreIncludes);
+
+	// Because we want to ensure that the root and the default locale
+	// specific files are included.
+	includeI18nIfExists('aloha', '/nls/i18n', 'aloha', coreIncludes);
+	includeI18nIfExists('aloha', '/nls/' + defaultLocale + '/i18n', 'aloha', coreIncludes);
+
+	var closureStartFrag;
+	var closureEndFrag;
+	if (devMode) {
+		// Because almondjs clobbers some global variables, we have to
+		// preserve them. In producation mode we achieve that with a
+		// closure, in dev mode we need some additional code.
+		closureStartFrag = 'closure-start-preserve-define.frag';
+		closureEndFrag = 'closure-end-restore-define.frag';
+	} else {
+		closureStartFrag = 'closure-start.frag';
+		closureEndFrag = 'closure-end.frag';
+	}
+
+	// Build the core module and core i18n modules.
+    modules.push({
+		name: 'aloha-core',
+		create: true,
+		override: {
+			alohaExclusive: 'lib',
+			alohaNamespace: true,
+		},
+		include: coreIncludes,
+	});
+
+	// Build a plugin module and i18n modules for each plugin.
+	eachPlugin(function (plugin, bundle, prefix) {
+		var includes = [plugin + '/' + plugin + '-plugin'];
+		var incl = additionalIncludes[bundle + '/' + plugin];
+		if (incl) {
+			includes = includes.concat(incl);
+		}
+		includeI18nIfExists(plugin, '/nls/i18n', prefix, includes);
+		includeI18nIfExists(plugin, '/nls/' + defaultLocale + '/i18n', prefix, includes);
+		modules.push({
+			name: prefix + '/' + plugin,
+			create: true,
+			override: {
+				alohaExclusive: 'plugins/' + bundle + '/' + plugin,
+				alohaNamespace: true,
+			},
+			include: includes
+		});
+	});
+
+	return {
     //The top level directory that contains your app. If this option is used
     //then it assumed your scripts are in a subdirectory under this path.
     //This option is not required. If it is not specified, then baseUrl
@@ -6,7 +274,7 @@
     //then all the files from the app directory will be copied to the dir:
     //output area, and baseUrl will assume to be a relative path under
     //this directory.
-    appDir: "../../src/",
+    appDir: appDir,
 
     //By default, all modules are located relative to this path. If baseUrl
     //is not explicitly set, then all modules are loaded relative to
@@ -21,182 +289,7 @@
     //Useful to map module names that are to resources on a CDN or other
     //http: URL when running in the browser and during an optimization that
     //file should be skipped because it has no dependencies.
-    paths: {
-		// These paths are the same setup as in aloha.js.
-		// r.js doesn't process dynamic configuration and calls to
-		// require() that don't list modules literally, so we need to
-		// maintain this duplicate list
-
-		// We don't include Aloha's patched jquery by default, the user
-		// should do it himself.
-		"jquery": "empty:",
-    	//"jquery": 'vendor/jquery-1.7.2',
-
-		// We do include Aloha's patched jquery-ui by default, but the
-		// user can override it if he is adventurous.
-		"jqueryui": 'vendor/jquery-ui-1.9m6',
-
-		// For the repository browser
-		'PubSub': 'vendor/pubsub/js/pubsub-unminified',
-		'Class': 'vendor/class',
-		'RepositoryBrowser': 'vendor/repository-browser/js/repository-browser-unminified',
-		'jstree': 'vendor/jquery.jstree',              // Mutates jquery
-		'jqgrid': 'vendor/jquery.jqgrid',              // Mutates jquery
-		'jquery-layout': 'vendor/jquery.layout',     // Mutates jquery
-		'jqgrid-locale-en': 'vendor/grid.locale.en', // Mutates jqgrid
-		'jqgrid-locale-de': 'vendor/grid.locale.de', // Mutates jqgrid
-		'repository-browser-i18n-de': 'vendor/repository-browser/js/repository-browser-unminified',
-		'repository-browser-i18n-en': 'vendor/repository-browser/js/repository-browser-unminified',
-
-		// Shortcuts for all common plugins
-		"ui": "../plugins/common/ui/lib",
-		"ui/vendor": "../plugins/common/ui/vendor",
-		"ui/css": "../plugins/common/ui/css",
-		"ui/nls": "../plugins/common/ui/nls",
-		"ui/res": "../plugins/common/ui/res",
-		"link": "../plugins/common/link/lib",
-		"link/vendor": "../plugins/common/link/vendor",
-		"link/css": "../plugins/common/link/css",
-		"link/nls": "../plugins/common/link/nls",
-		"link/res": "../plugins/common/link/res",
-		"table": "../plugins/common/table/lib",
-		"table/vendor": "../plugins/common/table/vendor",
-		"table/css": "../plugins/common/table/css",
-		"table/nls": "../plugins/common/table/nls",
-		"table/res": "../plugins/common/table/res",
-		"list": "../plugins/common/list/lib",
-		"list/vendor": "../plugins/common/list/vendor",
-		"list/css": "../plugins/common/list/css",
-		"list/nls": "../plugins/common/list/nls",
-		"list/res": "../plugins/common/list/res",
-		"image": "../plugins/common/image/lib",
-		"image/vendor": "../plugins/common/image/vendor",
-		"image/css": "../plugins/common/image/css",
-		"image/nls": "../plugins/common/image/nls",
-		"image/res": "../plugins/common/image/res",
-		"highlighteditables": "../plugins/common/highlighteditables/lib",
-		"highlighteditables/vendor": "../plugins/common/highlighteditables/vendor",
-		"highlighteditables/css": "../plugins/common/highlighteditables/css",
-		"highlighteditables/nls": "../plugins/common/highlighteditables/nls",
-		"highlighteditables/res": "../plugins/common/highlighteditables/res",
-		"format": "../plugins/common/format/lib",
-		"format/vendor": "../plugins/common/format/vendor",
-		"format/css": "../plugins/common/format/css",
-		"format/nls": "../plugins/common/format/nls",
-		"format/res": "../plugins/common/format/res",
-		"dom-to-xhtml": "../plugins/common/dom-to-xhtml/lib",
-		"dom-to-xhtml/vendor": "../plugins/common/dom-to-xhtml/vendor",
-		"dom-to-xhtml/css": "../plugins/common/dom-to-xhtml/css",
-		"dom-to-xhtml/nls": "../plugins/common/dom-to-xhtml/nls",
-		"dom-to-xhtml/res": "../plugins/common/dom-to-xhtml/res",
-		"contenthandler": "../plugins/common/contenthandler/lib",
-		"contenthandler/vendor": "../plugins/common/contenthandler/vendor",
-		"contenthandler/css": "../plugins/common/contenthandler/css",
-		"contenthandler/nls": "../plugins/common/contenthandler/nls",
-		"contenthandler/res": "../plugins/common/contenthandler/res",
-		"characterpicker": "../plugins/common/characterpicker/lib",
-		"characterpicker/vendor": "../plugins/common/characterpicker/vendor",
-		"characterpicker/css": "../plugins/common/characterpicker/css",
-		"characterpicker/nls": "../plugins/common/characterpicker/nls",
-		"characterpicker/res": "../plugins/common/characterpicker/res",
-		"commands": "../plugins/common/commands/lib",
-		"commands/vendor": "../plugins/common/commands/vendor",
-		"commands/css": "../plugins/common/commands/css",
-		"commands/nls": "../plugins/common/commands/nls",
-		"commands/res": "../plugins/common/commands/res",
-		"align": "../plugins/common/align/lib",
-		"align/vendor": "../plugins/common/align/vendor",
-		"align/css": "../plugins/common/align/css",
-		"align/nls": "../plugins/common/align/nls",
-		"align/res": "../plugins/common/align/res",
-		"abbr": "../plugins/common/abbr/lib",
-		"abbr/vendor": "../plugins/common/abbr/vendor",
-		"abbr/css": "../plugins/common/abbr/css",
-		"abbr/nls": "../plugins/common/abbr/nls",
-		"abbr/res": "../plugins/common/abbr/res",
-		"block": "../plugins/common/block/lib",
-		"block/vendor": "../plugins/common/block/vendor",
-		"block/css": "../plugins/common/block/css",
-		"block/nls": "../plugins/common/block/nls",
-		"block/res": "../plugins/common/block/res",
-		"horizontalruler": "../plugins/common/horizontalruler/lib",
-		"horizontalruler/vendor": "../plugins/common/horizontalruler/vendor",
-		"horizontalruler/css": "../plugins/common/horizontalruler/css",
-		"horizontalruler/nls": "../plugins/common/horizontalruler/nls",
-		"horizontalruler/res": "../plugins/common/horizontalruler/res",
-		"undo": "../plugins/common/undo/lib",
-		"undo/vendor": "../plugins/common/undo/vendor",
-		"undo/css": "../plugins/common/undo/css",
-		"undo/nls": "../plugins/common/undo/nls",
-		"undo/res": "../plugins/common/undo/res",
-		"paste": "../plugins/common/paste/lib",
-		"paste/vendor": "../plugins/common/paste/vendor",
-		"paste/css": "../plugins/common/paste/css",
-		"paste/nls": "../plugins/common/paste/nls",
-		"paste/res": "../plugins/common/paste/res",
-
-		// Shortcuts for some often used extra plugins (not all)
-		"cite": "../plugins/extra/cite/lib",
-		"cite/vendor": "../plugins/extra/cite/vendor",
-		"cite/css": "../plugins/extra/cite/css",
-		"cite/nls": "../plugins/extra/cite/nls",
-		"cite/res": "../plugins/extra/cite/res",
-		"flag-icons": "../plugins/extra/flag-icons/lib",
-		"flag-icons/vendor": "../plugins/extra/flag-icons/vendor",
-		"flag-icons/css": "../plugins/extra/flag-icons/css",
-		"flag-icons/nls": "../plugins/extra/flag-icons/nls",
-		"flag-icons/res": "../plugins/extra/flag-icons/res",
-		"numerated-headers": "../plugins/extra/numerated-headers/lib",
-		"numerated-headers/vendor": "../plugins/extra/numerated-headers/vendor",
-		"numerated-headers/css": "../plugins/extra/numerated-headers/css",
-		"numerated-headers/nls": "../plugins/extra/numerated-headers/nls",
-		"numerated-headers/res": "../plugins/extra/numerated-headers/res",
-		"formatlesspaste": "../plugins/extra/formatlesspaste/lib",
-		"formatlesspaste/vendor": "../plugins/extra/formatlesspaste/vendor",
-		"formatlesspaste/css": "../plugins/extra/formatlesspaste/css",
-		"formatlesspaste/nls": "../plugins/extra/formatlesspaste/nls",
-		"formatlesspaste/res": "../plugins/extra/formatlesspaste/res",
-		"linkbrowser": "../plugins/extra/linkbrowser/lib",
-		"linkbrowser/vendor": "../plugins/extra/linkbrowser/vendor",
-		"linkbrowser/css": "../plugins/extra/linkbrowser/css",
-		"linkbrowser/nls": "../plugins/extra/linkbrowser/nls",
-		"linkbrowser/res": "../plugins/extra/linkbrowser/res",
-		"imagebrowser": "../plugins/extra/imagebrowser/lib",
-		"imagebrowser/vendor": "../plugins/extra/imagebrowser/vendor",
-		"imagebrowser/css": "../plugins/extra/imagebrowser/css",
-		"imagebrowser/nls": "../plugins/extra/imagebrowser/nls",
-		"imagebrowser/res": "../plugins/extra/imagebrowser/res",
-		"ribbon": "../plugins/extra/ribbon/lib",
-		"ribbon/vendor": "../plugins/extra/ribbon/vendor",
-		"ribbon/css": "../plugins/extra/ribbon/css",
-		"ribbon/nls": "../plugins/extra/ribbon/nls",
-		"ribbon/res": "../plugins/extra/ribbon/res",
-		"toc": "../plugins/extra/toc/lib",
-		"toc/vendor": "../plugins/extra/toc/vendor",
-		"toc/css": "../plugins/extra/toc/css",
-		"toc/nls": "../plugins/extra/toc/nls",
-		"toc/res": "../plugins/extra/toc/res",
-		"wai-lang": "../plugins/extra/wai-lang/lib",
-		"wai-lang/vendor": "../plugins/extra/wai-lang/vendor",
-		"wai-lang/css": "../plugins/extra/wai-lang/css",
-		"wai-lang/nls": "../plugins/extra/wai-lang/nls",
-		"wai-lang/res": "../plugins/extra/wai-lang/res",
-		"headerids": "../plugins/extra/headerids/lib",
-		"headerids/vendor": "../plugins/extra/headerids/vendor",
-		"headerids/css": "../plugins/extra/headerids/css",
-		"headerids/nls": "../plugins/extra/headerids/nls",
-		"headerids/res": "../plugins/extra/headerids/res",
-		"metaview": "../plugins/extra/metaview/lib",
-		"metaview/vendor": "../plugins/extra/metaview/vendor",
-		"metaview/css": "../plugins/extra/metaview/css",
-		"metaview/nls": "../plugins/extra/metaview/nls",
-		"metaview/res": "../plugins/extra/metaview/res",
-		"listenforcer": "../plugins/extra/listenforcer/lib",
-		"listenforcer/vendor": "../plugins/extra/listenforcer/vendor",
-		"listenforcer/css": "../plugins/extra/listenforcer/css",
-		"listenforcer/nls": "../plugins/extra/listenforcer/nls",
-		"listenforcer/res": "../plugins/extra/listenforcer/res",
-    },
+	paths: paths,
 
     //The directory path to save the output. If not specified, then
     //the path will default to be a directory called "build" as a sibling
@@ -334,150 +427,9 @@
     //dependencies will be included in the module's file when the build is
     //done. If that module or any of its dependencies includes i18n bundles,
     //only the root bundles will be included unless the locale: section is set above.
-    modules: [
-        //Just specifying a module name means that module will be converted into
-        //a built file that contains all of its dependencies. If that module or any
-        //of its dependencies includes i18n bundles, they may not be included in the
-        //built file unless the locale: section is set above.
-        { name: "aloha-module",
-		  create: true,
-		  override: { alohaExclusive: "lib", },
-		  include: [
-			  'aloha',
-			  'vendor/class',
-			  'vendor/pubsub/js/pubsub',
-			  'vendor/amplify.store',
-			  'vendor/sanitize',
-		  ],
-		},
-		// all common plugins
-		{ name: "ui/ui-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/ui", },
-		  include: [
-			  'ui/ui-plugin',
-			  'ui/ui',
-			  'ui/arena',
-			  'ui/autocomplete',
-			  'ui/dialog',
-			  'ui/menuButton',
-			  'ui/multiSplit',
-			  'ui/port-helper-attribute-field',
-			  'ui/port-helper-multi-split',
-			  'ui/text',
-			  'ui/toggleButton',
-		  ],
-		},
-		{ name: "link/link-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/link", },
-		  include: [ 'link/link-plugin' ] },
-		{ name: "table/table-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/table", },
-		  include: [ 'table/table-plugin', ] },
-		{ name: "format/format-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/format", },
-		  include: [ 'format/format-plugin', ] },
-		{ name: "list/list-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/list", },
-		  include: [ 'list/list-plugin', ] },
-		{ name: "image/image-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/image", },
-		  include: [ 'image/image-plugin', ] },
-		{ name: "highlighteditables/highlighteditables-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/highlighteditables", },
-		  include: [ 'highlighteditables/highlighteditables-plugin', ] },
-		{ name: "dom-to-xhtml/dom-to-xhtml-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/dom-to-xhtml", },
-		  include: [ 'dom-to-xhtml/dom-to-xhtml-plugin', ] },
-		{ name: "contenthandler/contenthandler-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/contenthandler", },
-		  include: [ 'contenthandler/contenthandler-plugin', ] },
-		{ name: "characterpicker/characterpicker-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/characterpicker", },
-		  include: [ 'characterpicker/characterpicker-plugin', ]
-		},
-		{ name: "commands/commands-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/commands", },
-		  include: [ 'commands/commands-plugin', ] },
-		{ name: "block/block-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/block", },
-		  include: [
-			  'block/block-plugin',
-			  'block/editor',
-			  'block/sidebarattributeeditor',
-			  'block/blockcontenthandler',
-		  ]
-		},
-		{ name: "align/align-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/align", },
-		  include: [ 'align/align-plugin' ] },
-		{ name: "abbr/abbr-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/abbr", },
-		  include: [ 'abbr/abbr-plugin' ] },
-		{ name: "horizontalruler/horizontalruler-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/horizontalruler", },
-		  include: [ 'horizontalruler/horizontalruler-plugin' ] },
-		{ name: "paste/paste-module",
-		  create: true,
-		  override: { alohaExclusive: "plugins/common/paste", },
-		  include: [ 'paste/paste-plugin' ] },
-    ],
+    modules: modules,
 
-	// Custom Aloha directives interpreted only in the onBuildWrite function
-
-	// If true, will output document.write(...) directives such that the
-	// original unconcatenated files are loaded, so they can be
-	// debugged.
-	//alohaBuildForDevMode: true,
-
-	// If set, only files under this path will be included in the
-	// optimized output file. Other dependencies will simply be skipped.
-	//alohaExclusive: "path/to/dir",
-
-	// This onBuildWrite implementation implements the
-	// alohaBuildForDevMode and alohaExclusive directives. If neither
-	// alohaBuildForDevMode nor alohaExclusive are specified, will just
-	// return the unmodified contents.
-	onBuildWrite: function (moduleName, path, contents) {
-		'use strict';
-
-		// relativize("a/b/c/", "a/b/c/d/" ) => "d"
-		// relativize("a/b/c" , "a/b/c/d/e") => "d/e"
-		function relativize(ancestor, descendant) {
-			ancestor = ancestor.replace(/\/$/, '');
-			descendant = descendant.replace(/\/$/, '');
-			if (ancestor + '/' !== descendant.substring(0, ancestor.length + 1)) {
-				throw "Expected `" + ancestor + "' to be a ancestor of `" + descendant + "'";
-			}
-			return descendant.substring(ancestor.length + 1);
-		}
-
-		// The output folder is a common ancestor of all paths
-		var outputDir = this.dir.replace(/\/$/, '');
-		var relFromOutputDir = relativize(outputDir, path);
-
-		if (this.alohaExclusive && this.alohaExclusive + "/" !== relFromOutputDir.substring(0, this.alohaExclusive.length + 1)) {
-			return '';
-		}
-		if (this.alohaBuildForDevMode) {
-			return 'document.write(\'<script src="\' + ALOHA_BASE_URL + \'' + relFromOutputDir + '"></script>\');';
-		}
-		return contents;
-	},
+	onBuildWrite: onBuildWrite,
 
     //Another way to use wrap, but uses file paths. This makes it easier
     //to have the start text contain license information and the end text
@@ -485,10 +437,10 @@
     //window.myGlobal = requirejs('myModule');
     //File paths are relative to the build file, or if running a commmand
     //line build, the current directory.
-    //wrap: {
-    //    startFile: "closure-start.frag",
-    //    endFile: "closure-end.frag",
-    //},
+	wrap: {
+		startFile: closureStartFrag,
+		endFile: closureEndFrag,
+	},
 
     //By default, comments that have a license in them are preserved in the
     //output. However, for a larger built files there could be a lot of
@@ -507,4 +459,5 @@
     //SILENT: 4
     //Default is 0.
     logLevel: 0,
-})
+	};
+}())

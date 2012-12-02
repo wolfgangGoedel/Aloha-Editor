@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 function Sanitize(){
   var i, e, options;
   options = arguments[0] || {};
@@ -277,6 +276,4 @@ Sanitize.prototype.clean_node = function(container) {
   
 }
 
-if (window.define) {
-	define('vendor/sanitize', [], function () {});
-}
+define('contenthandler/vendor/sanitize', [], function () { return Sanitize; });
