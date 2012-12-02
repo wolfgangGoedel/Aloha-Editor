@@ -30,7 +30,7 @@
  * @name block.block
  * @namespace block/block
  */
-define('block/block-plugin', [
+define('block/block', [
        'aloha',
        'jquery',
        'block/blockmanager',
