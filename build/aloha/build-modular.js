@@ -98,7 +98,6 @@
 	var coreIncludes = [
 		// Rrequirejs i18n loader plugin.
 		'i18n',
-		'aloha',
 		'vendor/class',
 		'vendor/pubsub/js/pubsub',
 		'vendor/amplify.store'
@@ -222,18 +221,25 @@
 	includeI18nIfExists('aloha', '/nls/i18n', 'aloha', coreIncludes);
 	includeI18nIfExists('aloha', '/nls/' + defaultLocale + '/i18n', 'aloha', coreIncludes);
 
+	// The aloha module should come last (except for aloha-define-restore).
+	coreIncludes.push('aloha');
+
 	var closureStartFrag;
 	var closureEndFrag;
 	if (devMode) {
 		// Because almondjs clobbers some global variables, we have to
 		// preserve them. In producation mode we achieve that with a
 		// closure, in dev mode we need some additional code.
-		closureStartFrag = 'closure-start-preserve-define.frag';
-		closureEndFrag = 'closure-end-restore-define.frag';
+		closureStartFrag = 'closure-start-modular-preserve-define.frag';
+		// It's not possible to put the restore code in the
+		// closure-end.frag because it must be evaluated after the last
+		// script element that was injected with document write which
+		// can only be guaranteed with another document write.
+		coreIncludes.push('aloha-define-restore');
 	} else {
-		closureStartFrag = 'closure-start.frag';
-		closureEndFrag = 'closure-end.frag';
+		closureStartFrag = 'closure-start-modular.frag';
 	}
+	closureEndFrag = 'closure-end-modular.frag';
 
 	// Build the core module and core i18n modules.
     modules.push({
@@ -253,8 +259,12 @@
 		if (incl) {
 			includes = includes.concat(incl);
 		}
+		// See above for explanations about includeI18nIfExists and aloha-define-restore.
 		includeI18nIfExists(plugin, '/nls/i18n', prefix, includes);
 		includeI18nIfExists(plugin, '/nls/' + defaultLocale + '/i18n', prefix, includes);
+		if (devMode) {
+			coreIncludes.push('aloha-define-restore');
+		}
 		modules.push({
 			name: prefix + '/' + plugin,
 			create: true,

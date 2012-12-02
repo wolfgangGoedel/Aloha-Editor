@@ -5,4 +5,3 @@ if (Aloha.hasOwnProperty('_defineReplacedByAloha')) {
 	require = Aloha._requireReplacedByAloha;
 	requirejs = Aloha._requirejsReplacedByAloha;
 }
-}());

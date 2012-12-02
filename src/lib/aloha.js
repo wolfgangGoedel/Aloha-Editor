@@ -24,9 +24,15 @@
  * provided you include this license notice and a URL through which
  * recipients can access the Corresponding Source.
  */
+// Capture require and define because in build-modular profile dev
+// mode compilation the global require and define will only be
+// available until this script returns, not when the init function
+// is called.
 var define, require;
-(function (global) {
+(function (global, define, require) {
 	'use strict';
+
+	var Aloha = global.Aloha = global.Aloha || {};
 
 	/**
 	 * Gets the configuration for loading Aloha.
@@ -83,17 +89,6 @@ var define, require;
 			baseUrl: baseUrl,
 			plugins: plugins || []
 		};
-	}
-
-	function isDeferInit() {
-		var scripts = document.getElementsByTagName('script');
-		for (var i = 0; i < scripts.length; i++) {
-			var attr = scripts[i].getAttribute('data-aloha-defer-init');
-			if ("true" === attr) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -200,13 +195,10 @@ var define, require;
 		});
 	}
 
-	var myrequire = require, mydefine = define;
-
-	function load() {
-		var require = myrequire, define = mydefine;
+	function init(settings) {
 
 		Aloha.defaults = {};
-		Aloha.settings = Aloha.settings || {};
+		Aloha.settings = settings || Aloha.settings || {};
 
 		var loadConfig = getLoadConfig();
 		var pluginConfig = getPluginLoadConfig(loadConfig.plugins);
@@ -425,18 +417,13 @@ var define, require;
 			'aloha/repositoryobjects',
 			'aloha/contenthandlermanager'
 		], function(jQuery) {
-
 			// Set it again in case jQuery was loaded asynchronously.
 			Aloha.jQuery = jQuery;
-
 			// Some core files provide default settings in Aloha.defaults.
 			Aloha.settings = jQuery.extendObjects( true, {}, Aloha.defaults, Aloha.settings );
-
 			return Aloha;
 		});
 
-		// TODO aloha should not make the require call itself. Instead,
-		// user code should require and initialize aloha.
 		Aloha.stage = 'loadingAloha';
 		require(requireConfig, ['aloha', 'aloha/jquery'], function (Aloha, jQuery) {
 			Aloha.stage = 'loadPlugins';
@@ -448,35 +435,30 @@ var define, require;
 					window.rangy.init();
 					// The same for Aloha, but probably only because it
 					// depends on rangy.
-					Aloha.init();
+					Aloha._initInternal();
 				});
 			});
 		});
-	} // end load()
-
-	global.Aloha = global.Aloha || {};
-	if (global.Aloha.deferInit || isDeferInit()) {
-		global.Aloha.deferInit = load;
-	} else {
-		// Unless init is deferred above, aloha mus be loaded
-		// immediately in the development version, but later in the
-		// compiled version. The reason loading must be delayed in the
-		// compiled version is that the "include" directive in the r.js
-		// build profile, which lists the plugins that will be compiled
-		// into aloha.js, will include the plugins *after* this
-		// file. Since the require() call that loads the plugins is in
-		// this file, it will not see any of the plugin's defines that
-		// come after this file. The call to Aloha._load is only made in
-		// compiled mode in closure-end.frag. The call to load() below
-		// is only made in development mode because the excludeStart and
-		// excludeEnd r.js pragmas will exclude everything inbetween in
-		// the compiled version.
-		// TODO ideally the bootstrap file should not make the require
-		//      call at all. Instead, user code should require and
-		//      initialize aloha.
-		Aloha._load = load;
-		//>>excludeStart("alohaLoadInEndClosure", pragmas.alohaLoadInEndClosure);
-		load();
-		//>>excludeEnd("alohaLoadInEndClosure");
 	}
-}(window));
+
+	Aloha.init = init;
+    if (!Aloha.deferInit) {
+        // Unless init is deferred above, aloha mus be loaded
+        // immediately in the development version, but later in the
+        // compiled version. The reason loading must be delayed in the
+        // compiled version is that the "include" directive in the r.js
+        // build profile, which lists the plugins that will be compiled
+        // into aloha.js, will include the plugins *after* this
+        // file. Since the require() call that loads the plugins is in
+        // this file, it will not see any of the plugin's defines that
+        // come after this file. The call to Aloha._load is only made in
+        // compiled mode in closure-end.frag. The call to load() below
+        // is only made in development mode because the excludeStart and
+        // excludeEnd r.js pragmas will exclude everything inbetween in
+        // the compiled version.
+        Aloha._load = init;
+        //>>excludeStart("alohaLoadInEndClosure", pragmas.alohaLoadInEndClosure);
+        load();
+        //>>excludeEnd("alohaLoadInEndClosure");
+    }
+}(window, define, require));

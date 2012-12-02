@@ -113,7 +113,7 @@ define('aloha/core', [
 		/**
 		 * Initialize the initialization process
 		 */
-		init: function () {
+		_initInternal: function () {
 			// Load & Initialise
 			Aloha.stage = 'initAloha';
 			Aloha.initAloha(function(){

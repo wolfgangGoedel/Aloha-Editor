@@ -26,10 +26,5 @@
  * recipients can access the Corresponding Source.
  */
 (function() {
-// Because almond.js clobbers these global variables, we preserve them.
-// Also see aloha-define-cleanup.js
-// This is the same as in lib/aloha-define-preserve.js
-Aloha = window.Aloha || {};
-Aloha._defineReplacedByAloha = window.define;
-Aloha._requireReplacedByAloha = window.require;
-Aloha._requirejsReplacedByAloha = window.requirejs;
+// The modular build defers initialization by default.
+Aloha.deferInit = true;

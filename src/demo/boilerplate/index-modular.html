@@ -61,7 +61,7 @@
 
 	<script>var ALOHA_BASE_URL = '../../';
 //            Aloha.settings.locale = 'de';
-	        Aloha.deferInit = true;</script>
+    </script>
 	<script src="../../lib/aloha-core.js"></script>
 	<script src="../../lib/vendor/jquery-1.7.2.js"></script>
 	<script src="../../lib/vendor/jquery-ui-1.9m6.js"></script>
@@ -112,9 +112,10 @@
 	<script src="../../plugins/common/horizontalruler/horizontalruler.js"></script>
 	<script src="../../plugins/common/align/align.js"></script>
 	<script src="../../plugins/common/dom-to-xhtml/dom-to-xhtml.js"></script>
-    <script>Aloha.settings.jQuery = $.noConflict(true);</script>
-
-	<script>Aloha.deferInit();</script>
+    <script>
+	  Aloha.settings.jQuery = $.noConflict(true);
+	  Aloha.init();
+	</script>
 
 	<!-- Include the fake-jquery to make sure that Aloha works even if
 		 the user includes his own global jQuery after aloha.js. -->
