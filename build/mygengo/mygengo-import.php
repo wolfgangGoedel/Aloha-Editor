@@ -167,7 +167,7 @@ function convert_nls_file($section, $language, $data, $plugin = false) {
     $import_dir = './import/';
     
     // clean file input
-    $data = str_replace('define(', '', $data);
+    $data = preg_replace("(?:Aloha\.)?define\((?:'[^']*',|\"[^\"]*\",)?", '', $data);
     $data = str_replace(');', '', $data);
 
     // singe quotes to double quotes (maybe not so good ...)

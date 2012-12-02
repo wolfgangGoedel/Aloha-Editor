@@ -5,7 +5,7 @@
 */
 require_once 'nls.php';
 
-define("ENVIRONMENT_LIVE", false);
+define("ENVIRONMENT_LIVE", true);
 
 
 
@@ -43,7 +43,7 @@ if ($res === TRUE) {
 	echo "\n[error] Translations not downloaded or extracted\n";
 }
 
-// process all downloaded php language files and convert it to the aloha i8ln format
+// process all downloaded php language files and convert it to the aloha i18n format
 $languages =  get_directories($exportDir);
 $translations = array();
 //print_r($languages);
@@ -60,10 +60,10 @@ foreach ($languages as $language) {
 		require_once $exportDir.$language.'/'.$section;
 		//print_r($lang);
 		
-		foreach ($lang as $i8ln_key => $i8ln_value) {
+		foreach ($lang as $i18n_key => $i18n_value) {
 			$section = str_replace('.php', '', $section);
-			//$translations[$language][$section][$i8ln_key] = $i8ln_value;
-			$translations[$section][$language][$i8ln_key] = $i8ln_value;
+			//$translations[$language][$section][$i18n_key] = $i18n_value;
+			$translations[$section][$language][$i18n_key] = $i18n_value;
 		}
 	}
 }
@@ -101,13 +101,25 @@ lang file:
 
 */
 
+function module_from_section($section) {
+    $section_parts = explode('.', $section);
+    $module = $section_parts[2]; 
+    if (is_null($module)) {
+        $module = $section_parts[1];
+    }
+    if (is_null($module)) {
+        exit("Unable to determine module from " . $section);
+    }
+    return $module;
+}
+
 function generate_nls($translations) {
 	$exportDir = './nls/';
 	
 	foreach ($translations as $section => $language_data) {
 		echo "generate $section\n";
 		
-		$out = "define({\n";
+		$out = "Aloha.define('" . module_from_section($section) . "/nls/i18n', {\n";
 		$out .= "\t\"root\":  {\n";
 		
 		$master = $language_data['en'];
@@ -151,7 +163,7 @@ function generate_nls($translations) {
 		foreach ($available_languages as $lang_code) {
 			
 			echo "\n write language file for $section: $lang_code \n";
-			$out = "define({\n";
+			$out = "Aloha.define('" . module_from_section($section) . "/nls/" . $lang_code . "/i18n', {\n";
 
 			foreach ($language_data[$lang_code] as $translate_key => $translate_string) {
 				//$translate_string = htmlentities($translate_string, ENT_SUBSTITUTE); // needs php 5.4
@@ -172,10 +184,10 @@ function generate_nls($translations) {
 
 function write_nls_file($path_pattern, $language, $data) {
 	date_default_timezone_set('Europe/Vienna');
-	$file_name = 'i8ln-'.date('ymd').'.js';
+	$file_name = 'i18n-'.date('ymd').'.js';
 	
 	if (ENVIRONMENT_LIVE == true) {
-	    $file_name = 'i8ln.js';
+	    $file_name = 'i18n.js';
 	}
 
 	$path_dir = '../../src/'.str_replace('.', '/', $path_pattern).'/nls/';
