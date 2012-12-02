@@ -33,13 +33,19 @@ Aloha = window.Aloha || {};
 Aloha._defineReplacedByAloha = window.define;
 Aloha._requireReplacedByAloha = window.require;
 Aloha._requirejsReplacedByAloha = window.requirejs;
+// The modular build defers initialization by default.
+Aloha.deferInit = true;
 
 define = window.Aloha.define;document.write('<script data-gg-define="vendor/almond" src="' + ALOHA_BASE_URL + 'lib/vendor/almond.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="aloha-define-plugin" src="' + ALOHA_BASE_URL + 'lib/aloha-define-plugin.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="vendor/gg-define-anon" src="' + ALOHA_BASE_URL + 'lib/vendor/gg-define-anon.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="aloha-define" src="' + ALOHA_BASE_URL + 'lib/aloha-define.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="i18n" src="' + ALOHA_BASE_URL + 'lib/i18n.js"></script>');
+define = window.Aloha.define;document.write('<script data-gg-define="vendor/class" src="' + ALOHA_BASE_URL + 'lib/vendor/class.js"></script>');
+define = window.Aloha.define;document.write('<script data-gg-define="vendor/pubsub/js/pubsub" src="' + ALOHA_BASE_URL + 'lib/vendor/pubsub/js/pubsub.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="util/json2" src="' + ALOHA_BASE_URL + 'lib/util/json2.js"></script>');
+define = window.Aloha.define;document.write('<script data-gg-define="vendor/amplify.store" src="' + ALOHA_BASE_URL + 'lib/vendor/amplify.store.js"></script>');
+define = window.Aloha.define;document.write('<script data-gg-define="aloha/nls/i18n" src="' + ALOHA_BASE_URL + 'lib/aloha/nls/i18n.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="aloha/rangy-core" src="' + ALOHA_BASE_URL + 'lib/aloha/rangy-core.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="util/class" src="' + ALOHA_BASE_URL + 'lib/util/class.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="util/lang" src="' + ALOHA_BASE_URL + 'lib/util/lang.js"></script>');
@@ -51,7 +57,6 @@ define = window.Aloha.define;document.write('<script data-gg-define="aloha/conso
 define = window.Aloha.define;document.write('<script data-gg-define="util/range" src="' + ALOHA_BASE_URL + 'lib/util/range.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="util/arrays" src="' + ALOHA_BASE_URL + 'lib/util/arrays.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="util/strings" src="' + ALOHA_BASE_URL + 'lib/util/strings.js"></script>');
-define = window.Aloha.define;document.write('<script data-gg-define="PubSub" src="' + ALOHA_BASE_URL + 'lib/vendor/pubsub/js/pubsub-unminified.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="aloha/engine" src="' + ALOHA_BASE_URL + 'lib/aloha/engine.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="aloha/selection" src="' + ALOHA_BASE_URL + 'lib/aloha/selection.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="aloha/block-jump" src="' + ALOHA_BASE_URL + 'lib/aloha/block-jump.js"></script>');
@@ -76,14 +81,4 @@ define = window.Aloha.define;document.write('<script data-gg-define="aloha/repos
 define = window.Aloha.define;document.write('<script data-gg-define="aloha/repository" src="' + ALOHA_BASE_URL + 'lib/aloha/repository.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="aloha/repositoryobjects" src="' + ALOHA_BASE_URL + 'lib/aloha/repositoryobjects.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="aloha" src="' + ALOHA_BASE_URL + 'lib/aloha.js"></script>');
-define = window.Aloha.define;document.write('<script data-gg-define="vendor/class" src="' + ALOHA_BASE_URL + 'lib/vendor/class.js"></script>');
-define = window.Aloha.define;document.write('<script data-gg-define="vendor/pubsub/js/pubsub" src="' + ALOHA_BASE_URL + 'lib/vendor/pubsub/js/pubsub.js"></script>');
-define = window.Aloha.define;document.write('<script data-gg-define="vendor/amplify.store" src="' + ALOHA_BASE_URL + 'lib/vendor/amplify.store.js"></script>');
-define = window.Aloha.define;document.write('<script data-gg-define="aloha/nls/i18n" src="' + ALOHA_BASE_URL + 'lib/aloha/nls/i18n.js"></script>');// Because almond.js clobbers these global variables, we preserve them.
-// Also see aloha-define-preserve.js
-if (Aloha.hasOwnProperty('_defineReplacedByAloha')) {
-	define = Aloha._defineReplacedByAloha;
-	require = Aloha._requireReplacedByAloha;
-	requirejs = Aloha._requirejsReplacedByAloha;
-}
-}());
+define = window.Aloha.define;document.write('<script data-gg-define="aloha-define-restore" src="' + ALOHA_BASE_URL + 'lib/aloha-define-restore.js"></script>');}());

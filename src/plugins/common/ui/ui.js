@@ -33,6 +33,8 @@ Aloha = window.Aloha || {};
 Aloha._defineReplacedByAloha = window.define;
 Aloha._requireReplacedByAloha = window.require;
 Aloha._requirejsReplacedByAloha = window.requirejs;
+// The modular build defers initialization by default.
+Aloha.deferInit = true;
 
 ;
 ;
@@ -97,11 +99,4 @@ define = window.Aloha.define;document.write('<script data-gg-define="ui/multiSpl
 define = window.Aloha.define;document.write('<script data-gg-define="ui/port-helper-attribute-field" src="' + ALOHA_BASE_URL + 'plugins/common/ui/lib/port-helper-attribute-field.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="ui/port-helper-multi-split" src="' + ALOHA_BASE_URL + 'plugins/common/ui/lib/port-helper-multi-split.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="ui/text" src="' + ALOHA_BASE_URL + 'plugins/common/ui/lib/text.js"></script>');
-define = window.Aloha.define;document.write('<script data-gg-define="ui/toggleButton" src="' + ALOHA_BASE_URL + 'plugins/common/ui/lib/toggleButton.js"></script>');// Because almond.js clobbers these global variables, we preserve them.
-// Also see aloha-define-preserve.js
-if (Aloha.hasOwnProperty('_defineReplacedByAloha')) {
-	define = Aloha._defineReplacedByAloha;
-	require = Aloha._requireReplacedByAloha;
-	requirejs = Aloha._requirejsReplacedByAloha;
-}
-}());
+define = window.Aloha.define;document.write('<script data-gg-define="ui/toggleButton" src="' + ALOHA_BASE_URL + 'plugins/common/ui/lib/toggleButton.js"></script>');}());

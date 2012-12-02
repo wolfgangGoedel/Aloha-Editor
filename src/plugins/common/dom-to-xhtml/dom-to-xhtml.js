@@ -33,6 +33,8 @@ Aloha = window.Aloha || {};
 Aloha._defineReplacedByAloha = window.define;
 Aloha._requireReplacedByAloha = window.require;
 Aloha._requirejsReplacedByAloha = window.requirejs;
+// The modular build defers initialization by default.
+Aloha.deferInit = true;
 
 ;
 ;
@@ -72,11 +74,4 @@ Aloha._requirejsReplacedByAloha = window.requirejs;
 ;
 ;
 define = window.Aloha.define;document.write('<script data-gg-define="dom-to-xhtml/dom-to-xhtml" src="' + ALOHA_BASE_URL + 'plugins/common/dom-to-xhtml/lib/dom-to-xhtml.js"></script>');
-define = window.Aloha.define;document.write('<script data-gg-define="dom-to-xhtml/dom-to-xhtml-plugin" src="' + ALOHA_BASE_URL + 'plugins/common/dom-to-xhtml/lib/dom-to-xhtml-plugin.js"></script>');// Because almond.js clobbers these global variables, we preserve them.
-// Also see aloha-define-preserve.js
-if (Aloha.hasOwnProperty('_defineReplacedByAloha')) {
-	define = Aloha._defineReplacedByAloha;
-	require = Aloha._requireReplacedByAloha;
-	requirejs = Aloha._requirejsReplacedByAloha;
-}
-}());
+define = window.Aloha.define;document.write('<script data-gg-define="dom-to-xhtml/dom-to-xhtml-plugin" src="' + ALOHA_BASE_URL + 'plugins/common/dom-to-xhtml/lib/dom-to-xhtml-plugin.js"></script>');}());

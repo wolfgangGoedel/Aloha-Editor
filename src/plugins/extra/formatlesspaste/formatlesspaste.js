@@ -33,6 +33,8 @@ Aloha = window.Aloha || {};
 Aloha._defineReplacedByAloha = window.define;
 Aloha._requireReplacedByAloha = window.require;
 Aloha._requirejsReplacedByAloha = window.requirejs;
+// The modular build defers initialization by default.
+Aloha.deferInit = true;
 
 ;
 ;
@@ -92,11 +94,4 @@ Aloha._requirejsReplacedByAloha = window.requirejs;
 define = window.Aloha.define;document.write('<script data-gg-define="formatlesspaste/formatlesshandler" src="' + ALOHA_BASE_URL + 'plugins/extra/formatlesspaste/lib/formatlesshandler.js"></script>');
 define = window.Aloha.define;document.write('<script data-gg-define="formatlesspaste/nls/i18n" src="' + ALOHA_BASE_URL + 'plugins/extra/formatlesspaste/nls/i18n.js"></script>');
 ;
-define = window.Aloha.define;document.write('<script data-gg-define="formatlesspaste/formatlesspaste-plugin" src="' + ALOHA_BASE_URL + 'plugins/extra/formatlesspaste/lib/formatlesspaste-plugin.js"></script>');// Because almond.js clobbers these global variables, we preserve them.
-// Also see aloha-define-preserve.js
-if (Aloha.hasOwnProperty('_defineReplacedByAloha')) {
-	define = Aloha._defineReplacedByAloha;
-	require = Aloha._requireReplacedByAloha;
-	requirejs = Aloha._requirejsReplacedByAloha;
-}
-}());
+define = window.Aloha.define;document.write('<script data-gg-define="formatlesspaste/formatlesspaste-plugin" src="' + ALOHA_BASE_URL + 'plugins/extra/formatlesspaste/lib/formatlesspaste-plugin.js"></script>');}());

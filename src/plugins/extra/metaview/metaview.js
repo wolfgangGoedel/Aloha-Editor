@@ -33,6 +33,8 @@ Aloha = window.Aloha || {};
 Aloha._defineReplacedByAloha = window.define;
 Aloha._requireReplacedByAloha = window.require;
 Aloha._requirejsReplacedByAloha = window.requirejs;
+// The modular build defers initialization by default.
+Aloha.deferInit = true;
 
 ;
 ;
@@ -92,11 +94,4 @@ Aloha._requirejsReplacedByAloha = window.requirejs;
 define = window.Aloha.define;document.write('<script data-gg-define="metaview/nls/i18n" src="' + ALOHA_BASE_URL + 'plugins/extra/metaview/nls/i18n.js"></script>');
 ;
 define = window.Aloha.define;document.write('<script data-gg-define="metaview/metaview-plugin" src="' + ALOHA_BASE_URL + 'plugins/extra/metaview/lib/metaview-plugin.js"></script>');
-define = window.Aloha.define;document.write('<script data-gg-define="metaview/nls/en/i18n" src="' + ALOHA_BASE_URL + 'plugins/extra/metaview/nls/en/i18n.js"></script>');// Because almond.js clobbers these global variables, we preserve them.
-// Also see aloha-define-preserve.js
-if (Aloha.hasOwnProperty('_defineReplacedByAloha')) {
-	define = Aloha._defineReplacedByAloha;
-	require = Aloha._requireReplacedByAloha;
-	requirejs = Aloha._requirejsReplacedByAloha;
-}
-}());
+define = window.Aloha.define;document.write('<script data-gg-define="metaview/nls/en/i18n" src="' + ALOHA_BASE_URL + 'plugins/extra/metaview/nls/en/i18n.js"></script>');}());
