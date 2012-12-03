@@ -263,7 +263,7 @@
 		includeI18nIfExists(plugin, '/nls/i18n', prefix, includes);
 		includeI18nIfExists(plugin, '/nls/' + defaultLocale + '/i18n', prefix, includes);
 		if (devMode) {
-			coreIncludes.push('aloha-define-restore');
+			includes.push('aloha-define-restore');
 		}
 		modules.push({
 			name: prefix + '/' + plugin,
