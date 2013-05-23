@@ -4583,21 +4583,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 			// removed any existing empty text nodes), we can safely unwrap the
 			// node's contents, and correct the range if necessary
 			if (node.parentNode.childNodes.length == 1) {
-				newStartOffset = range.startOffset;
-				newEndOffset = range.endOffset;
-
-				if (range.startContainer === node.parentNode && range.startOffset > getNodeIndex(node)) {
-					// the node (1 element) will be replaced by its contents (contents().length elements)
-					newStartOffset = range.startOffset + (jQuery(node).contents().length - 1);
-				}
-				if (range.endContainer === node.parentNode && range.endOffset > getNodeIndex(node)) {
-					// the node (1 element) will be replaced by its contents (contents().length elements)
-					newEndOffset = range.endOffset + (jQuery(node).contents().length - 1);
-				}
-				jQuery(node).contents().unwrap();
-				range.startOffset = newStartOffset;
-				range.endOffset = newEndOffset;
-				// after unwrapping, we are done
+				Html.unwrapNodes(jQuery(node).contents().toArray(), range);
 				break;
 			} else {
 				// store the original parent
@@ -4608,22 +4594,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 				// this situation can occur, e.g. when we insert a paragraph into an contenteditable span
 				// in such cases, we just unwrap the contents of the paragraph
 				if (originalParent === node.parentNode) {
-					// so we unwrap now
-					newStartOffset = range.startOffset;
-					newEndOffset = range.endOffset;
-
-					if (range.startContainer === node.parentNode && range.startOffset > getNodeIndex(node)) {
-						// the node (1 element) will be replaced by its contents (contents().length elements)
-						newStartOffset = range.startOffset + (jQuery(node).contents().length - 1);
-					}
-					if (range.endContainer === node.parentNode && range.endOffset > getNodeIndex(node)) {
-						// the node (1 element) will be replaced by its contents (contents().length elements)
-						newEndOffset = range.endOffset + (jQuery(node).contents().length - 1);
-					}
-					jQuery(node).contents().unwrap();
-					range.startOffset = newStartOffset;
-					range.endOffset = newEndOffset;
-					// after unwrapping, we are done
+					Html.unwrapNodes(jQuery(node).contents().toArray(), range);
 					break;
 				}
 			}

@@ -55,3 +55,6 @@ All changes are categorized into one of the following keywords:
 	selected and a non-control key was pressed, the browsers native
 	delete implemention was used. The latter case now also uses
 	Aloha's custom implementation.
+
+- **ENHANCEMENT** core: vertical orientation of content will be better preserved
+                  when unwrapping block level nodes

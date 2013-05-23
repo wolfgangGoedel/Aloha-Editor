@@ -1240,6 +1240,7 @@ define([
 		setStyle: setStyle,
 		getStyle: getStyle,
 		getComputedStyle: getComputedStyle,
-		hasAttrs: hasAttrs
+		hasAttrs: hasAttrs,
+		nodeLength: nodeLength
 	};
 });

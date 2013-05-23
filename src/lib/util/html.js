@@ -25,10 +25,12 @@
  * recipients can access the Corresponding Source.
  */
 define([
+	'jquery',
 	'util/dom2',
 	'util/maps',
 	'util/arrays'
 ], function (
+	$,
 	Dom,
 	Maps,
 	Arrays
@@ -185,10 +187,16 @@ define([
 		true
 	);
 
+	/**
+	 * @todo: move to dom2.js1
+	 */
 	function isBlock(node) {
-		return blocksTagnameMap[node.nodeName];
+		return node && blocksTagnameMap[node.nodeName];
 	}
 
+	/**
+	 * @todo: improve by ignoring zero-width-spaces
+	 */
 	function isIgnorableWhitespace(node) {
 		return 3 === node.nodeType && !node.length;
 	}
@@ -204,6 +212,13 @@ define([
 	 * caveat that it only examines the given node and not any siblings.
 	 * An additional check is necessary to determine whether the node
 	 * occurs after/before a linebreaking node.
+	 *
+	 * If is also necessary to check whether the node is immediately following a
+	 * start tag or immediately before an end tag, since nodes at these terminal
+	 * positions must not be rendered if they only contain zero-width and white
+	 * spaces characters.
+	 *
+	 * @see: http://www.w3.org/TR/html401/struct/text.html#h-9.1
 	 *
 	 * Taken from
 	 * http://code.google.com/p/rangy/source/browse/trunk/src/js/modules/rangy-cssclassapplier.js
@@ -455,6 +470,552 @@ define([
 		return (/[\x00-\x1f\x7f-\x9f]/).test(chr);
 	}
 
+	/**
+	 * Unicode space characters as defined in the W3 HTML5 specification:
+	 * http://www.w3.org/TR/html5/infrastructure.html#common-parser-idioms
+	 *
+	 * @const
+	 * @type {Array.<string>}
+	 */
+	var SPACE_CHARACTERS = [
+		'\\u0009', // TAB
+		'\\u000A', // LF
+		'\\u000C', // FF
+		'\\u000D', // CR
+		'\\u0020'  // SPACE
+	];
+
+	/**
+	 * Unicode zero width space characters:
+	 * http://www.unicode.org/Public/UNIDATA/Scripts.txt
+	 *
+	 * @const
+	 * @type {Array.<string>}
+	 */
+	var ZERO_WIDTH_CHARACTERS = [
+		'\\u200B', // ZWSP
+		'\\u200C',
+		'\\u200D',
+		'\\uFEFF'  // ZERO WIDTH NO-BREAK SPACE
+	];
+
+	/**
+	 * Unicode White_Space characters are those that have the Unicode property
+	 * "White_Space" in the Unicode PropList.txt data file.
+	 *
+	 * http://www.unicode.org/Public/UNIDATA/PropList.txt
+	 *
+	 * @const
+	 * @type {Array.<string>}
+	 */
+	var WHITE_SPACE_CHARACTERS_UNICODES = [
+		'\\u0009',
+		'\\u000A',
+		'\\u000B',
+		'\\u000C',
+		'\\u000D',
+		'\\u0020',
+		'\\u0085',
+		'\\u00A0', // NON BREAKING SPACE ("&nbsp;")
+		'\\u1680',
+		'\\u180E',
+		'\\u2000',
+		'\\u2001',
+		'\\u2002',
+		'\\u2003',
+		'\\u2004',
+		'\\u2005',
+		'\\u2006',
+		'\\u2007',
+		'\\u2008',
+		'\\u2009',
+		'\\u200A',
+		'\\u2028',
+		'\\u2029',
+		'\\u202F',
+		'\\u205F',
+		'\\u3000'
+	];
+
+	var wspChars = WHITE_SPACE_CHARACTERS_UNICODES.join('');
+
+	/**
+	 * Regular expression that matches one or more sequences of white space
+	 * characters.
+	 *
+	 * @type {RegExp}
+	 */
+	var WSP_CHARACTERS = new RegExp('[' + wspChars + ']+');
+
+	/**
+	 * Regular expression that matches one or more sequences of zero width
+	 * characters.
+	 *
+	 * @type {RegExp}
+	 */
+	var ZWSP_CHARACTERS = new RegExp('[' + ZERO_WIDTH_CHARACTERS.join('') + ']+');
+
+	/**
+	 * Regular expression that matches one or more sequences of white space
+	 * characters at the start of a string.
+	 *
+	 * @type {RegExp}
+	 */
+	var WSP_CHARACTERS_FROM_START = new RegExp('^[' + wspChars + ']+');
+
+	/**
+	 * Regular expression that matches zero or more sequences of white space
+	 * characters at the end of a string.
+	 *
+	 * @type {RegExp}
+	 */
+	var WSP_CHARACTERS_FROM_END   = new RegExp('[' + wspChars + ']+$');
+
+	/**
+	 * Checks whether or not a given node is a text node that consists of only
+	 * sequence of white space characters as defined by W3 specification:
+	 *
+	 * http://www.w3.org/TR/html401/struct/text.html#h-9.1
+	 *
+	 * @param {HTMLELement} node
+	 * @return {boolean} True is node is a textNode of white characters.
+	 */
+	function isWhitespaces(node) {
+		return WSP_CHARACTERS.test(node.data);
+	}
+
+	/**
+	 * Checks whether or not a given node is a text node that consists of only
+	 * sequence of zero-width characters.
+	 *
+	 * @param {HTMLELement} node
+	 * @return {boolean} True is node is a textNode of zero-width characters
+	 */
+	function isZeroWidthCharacters(node) {
+		return ZWSP_CHARACTERS.test(node.data);
+	}
+
+	/**
+	 * Collects a sequence of contiguous nodes, that match a given condition in
+	 * a specified direction, adjacent to the a node.
+	 *
+	 * http://www.w3.org/TR/html5/infrastructure.html#collect-a-sequence-of-characters
+	 *
+	 * @param {String} direction
+	 * @param {HTMLElement} node
+	 * @param {function(HTMLElement):boolean} condition
+	 * @return {Array.<HTMLElements>} A list of contiguous nodes to the left of
+	 *                                `node`.
+	 */
+	function collectNodesUntil(direction, node, condition) {
+		var next = 'left' === direction ? 'previousSibling' : 'nextSibling';
+		node = node[next];
+		var nodes = [];
+		while (node && condition(node)) {
+			nodes.push(node);
+			node = node[next];
+		}
+		return nodes;
+	}
+
+	/**
+	 * Collects a sequence of contiguous nodes left adjacent to given node,
+	 * until the specified condition is broken.
+	 *
+	 * @param {HTMLElement} node
+	 * @param {function(HTMLElement):boolean} condition
+	 * @return {Array.<HTMLElement>} List of contiguous nodes
+	 */
+	function collectNodesLeftUntil(node, condition) {
+		return collectNodesUntil('left', node, condition);
+	}
+
+	/**
+	 * Collects a sequence of contiguous nodes right adjacent to given node,
+	 * until the specified condition is broken.
+	 *
+	 * Symmetrical to collectNodeLeftUntil()
+	 *
+	 * @param {HTMLElement} node
+	 * @param {function(HTMLElement):boolean} condition
+	 * @return {Array.<HTMLElement>} List of contiguous nodes
+	 */
+	function collectNodesRightUntil(node, condition) {
+		return collectNodesUntil('right', node, condition);
+	}
+
+	/**
+	 * Trims the given text node using the specified regular expression (either
+	 * WSP_CHARACTERS_FROM_START or WSP_CHARACTERS_FROM_END), and return the
+	 * number of characters removed.
+	 *
+	 * @todo: Unuse a replace function that will preseve range
+	 *
+	 * @param {HTMLElement} node
+	 * @param {RegExp} regexp
+	 * @return {object} And object containining the property `delta` and `pos`.
+	 */
+	function trimNode(node, regex) {
+		if (!node.data) {
+			return {
+				node: node,
+				position: 0,
+				delta: 0,
+				direction: 'left'
+			};
+		}
+		var originalLength = node.length;
+		var offset;
+		// https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String/replace
+		node.data = node.data.replace(regex, function () {
+			offset = arguments[arguments.length - 2];
+			return '';
+		});
+		return {
+			node: node,
+			position: offset || 0,
+			delta: originalLength - node.data.length,
+			direction: offset ? 'right' : 'left'
+		};
+	}
+
+	/**
+	 * Trims a node of white space characters from the start.
+	 *
+	 * @param {HTMLElement} node
+	 * @return {object}
+	 */
+	function trimNodeLeft(node) {
+		return trimNode(node, WSP_CHARACTERS_FROM_START);
+	}
+
+	/**
+	 * Trims a node of white space characters from the end.
+	 *
+	 * @param {HTMLElement} node
+	 * @return {object}
+	 */
+	function trimNodeRight(node) {
+		return trimNode(node, WSP_CHARACTERS_FROM_END);
+	}
+
+	/**
+	 * Adjust a range's offset based on whether the deletion that took place
+	 * during a trimNode() operation.
+	 *
+	 * @param {number} offset
+	 * @param {object} deletion
+	 */
+	function adjustOffsetAfterTrim(offset, direction, delta, position) {
+		if ('left' === direction) {
+			return (position > offset)
+				? offset - delta + (position - offset)
+				: offset - delta;
+		}
+		return (position < offset)
+			? offset - delta + (offset - position)
+			: offset;
+	}
+
+	/**
+	 * Corrects the range offsets as needed depending on the number of
+	 * characters that were removed after trimming the given node.
+	 *
+	 * @param {Range} range
+	 * @param {object} deletion
+	 */
+	function adjustRangeAfterTrim(range, deletion) {
+		if (!range) {
+			return;
+		}
+		if (deletion.node === range.startContainer) {
+			range.startOffset = adjustOffsetAfterTrim(
+				range.startOffset,
+				deletion.direction,
+				deletion.delta,
+				deletion.position
+			);
+		}
+		if (deletion.node === range.endContainer) {
+			range.endOffset = adjustOffsetAfterTrim(
+				range.endOffset,
+				deletion.direction,
+				deletion.delta,
+				deletion.position
+			);
+		}
+	}
+
+	/**
+	 * Checks whether the given node positioned at either extremity of it's
+	 * sibling linked list.
+	 *
+	 * @param {HTMLElement} node
+	 * @return {boolean} True if node is wither the first or last child of its
+	 *                   parent.
+	 */
+	function isTerminalSibling(node) {
+		var parent = node.parentNode;
+		return parent && (
+			node === parent.firstChild || node === parent.lastChild
+		);
+	}
+
+	/**
+	 * Checks whether the given node is next to a block level elemnt.
+	 *
+	 * @param {HTMLElement} node
+	 * @return {boolean}
+	 */
+	function isAdjacentToBlock(node) {
+		return isBlock(node.previousSibling) || isBlock(node.nextSibling);
+	}
+
+	function isUnrenderedNode(node) {
+		if (!node) {
+			return false;
+		}
+
+		// Because isUnrenderedWhiteSpaceNoBlockCheck() will give us false
+		// positives but never false negatives, the algorithm that will follow
+		// will make certain, and will also consider unrendered <br>s.
+		var maybeUnrenderedNode = isUnrenderedWhitespaceNoBlockCheck(node);
+
+		// Because a <br> element that is a child node adjacent to its parent's
+		// end tag (terminal sibling) must not be rendered.
+		if (
+			!maybeUnrenderedNode
+				&& (node === node.parentNode.lastChild)
+					&& isBlock(node.parentNode)
+						&& 'BR' === node.nodeName
+		) {
+			return true;
+		}
+
+		if (
+			maybeUnrenderedNode
+				&& (
+					isTerminalSibling(node)
+						|| isAdjacentToBlock(node)
+							|| skipUnrenderedToEndOfLine(Dom.cursor(node, false))
+								|| skipUnrenderedToStartOfLine(Dom.cursor(node, false))
+				)
+		) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Removes an elements unrendered child nodes that are either immediately
+	 * after an opening tag, or immediately before a closing tag.
+	 *
+	 * The range will be preserved.
+	 *
+	 * This function is useful for preparing the given node for being unwrapped.
+	 *
+	 * @param {HTMLElement} node
+	 * @param {Range} range
+	 */
+	function removeUnrenderedTerminalChildren(node, range) {
+		if (!node.firstChild) {
+			return;
+		}
+		if (Dom.isTextNode(node.firstChild)) {
+			adjustRangeAfterTrim(range, trimNodeLeft(node.firstChild));
+		}
+		if (isUnrenderedNode(node.firstChild)) {
+			Dom.removePreservingRange(node.firstChild, range);
+		}
+		if (Dom.isTextNode(node.lastChild)) {
+			adjustRangeAfterTrim(range, trimNodeRight(node.lastChild));
+		}
+		if (isUnrenderedNode(node.lastChild)) {
+			Dom.removePreservingRange(node.lastChild, range);
+		}
+	}
+
+	function removeUnrenderedAdjacentSiblings(node, range) {
+		var unrenderedAdjacentSiblings = [].concat(
+			collectNodesLeftUntil(node, isWhitespaces),
+			collectNodesLeftUntil(node, isZeroWidthCharacters),
+			collectNodesRightUntil(node, isWhitespaces),
+			collectNodesRightUntil(node, isZeroWidthCharacters)
+		);
+		var i;
+		for (i = 0; i < unrenderedAdjacentSiblings.length; i++) {
+			Dom.removePreservingRange(unrenderedAdjacentSiblings[i], range);
+		}
+	}
+
+	/**
+	 * Unrwaps the given node while maintaining the range.
+	 *
+	 * The node that is to be unwrapped (1 element) will be replaced by its
+	 * contents (contents().length elements)
+	 *
+	 * @param {HTMLElement} node
+	 * @param {Range} range
+	 */
+	function unwrapPreservingRange(node, range) {
+		var index = Dom.nodeIndex(node);
+		var parent = node.parentNode;
+		var numChildNodes = Dom.nodeLength(parent);
+		var start = range.startOffset;
+		var end = range.endOffset;
+
+		if (range.startContainer === parent && start > index) {
+			start += numChildNodes - 1;
+		}
+		if (range.endContainer === parent && end > index) {
+			end += numChildNodes - 1;
+		}
+
+		$(node).unwrap();
+
+		range.startOffset = start;
+		range.endOffset = end;
+	}
+
+	/**
+	 * Unwrap a element which is a child of a block-level node, while preserving
+	 * virtical orientation.
+	 *
+	 * SGML (see [ISO8879], section 7.6.1) specifies that a line break
+	 * immediately following a start tag must be ignored, as must a line break
+	 * immediately before an end tag. This applies to all HTML elements without
+	 * exception.
+	 *
+	 * The browser ignores all white spaces at these positions, not only line
+	 * break characters.
+	 *
+	 * The following two HTML examples must be rendered identically:
+	 *
+	 * <P>Thomas is watching TV.</P>
+	 * <P>
+	 * Thomas is watching TV.
+	 * </P>
+	 *
+	 * WARNING:
+	 * Chrome (at least) does not seem to follow this rule onsistantly with
+	 * inline elements.  For example, the following two HTML snippets should be
+	 * rendered as "|foo|" according to the specification:
+	 *
+	 * |<span>foo</span>|
+	 *
+	 * |<span>
+	 * foo
+	 * </span>|
+	 *
+	 * yet Chrome renders the second with single white spaces around "foo":
+	 * "| foo |".
+	 *
+	 * Todo:
+	 * We must also ignore <br>s that are adjecent to an opening or closing
+	 * block level element, since they too are unrendered in non IE-browsers.
+	 *
+	 * See also:
+	 * https://bugzilla.mozilla.org/show_bug.cgi?id=69032#c23
+	 * https://www.mozdev.org/pipermail/mozile/2006-June/001057.html
+	 *
+	 * References:
+	 * http://www.w3.org/TR/html401/struct/text.html#h-9.1
+	 * http://www.w3.org/TR/html401/struct/text.html#line-breaks
+	 * http://www.w3.org/TR/html401/appendix/notes.html#notes-line-breaks
+	 *
+	 * @param {HTMLElement} node A node whose parent is a block level element.
+	 * @param {Range} range
+	 */
+	function unwrapBlockChild(node, range) {
+		var parent = node.parentNode;
+
+		// Because in the course of unwrapping the <span> node, unrendered node
+		// must be pruned, before the wrapping parent node is removed.
+		//
+		//          (unwrapping)
+		// (remove)     node
+		//  parent       |
+		//    |          |
+		//    | (remove) | (remove) (remove)   (remove)
+		//    | adjacent | terminal terminal   adjacent
+		//    | sibling  |  child    child     sibling
+		//    |   |      |   |       |            |
+		//    v   v      v   v       v            v
+		//   <p><wsp><span><wsp>foo<br/></span><zwsp></p>
+
+		removeUnrenderedTerminalChildren(parent, range);
+
+		removeUnrenderedAdjacentSiblings(parent, range);
+
+		// Because appending adds content at the very end of the container
+		// element, the content will always be within  the range if the
+		// container happens to be the parent container.
+		$(parent).append('<br/>');
+
+		// Because the node itself may have been removed during removal of
+		// unrendered nodes, and may therefore be detached.
+		if (node.parentNode) {
+			unwrapPreservingRange(node, range);
+		}
+	}
+
+	/**
+	 * Unwraps the given node from its parent element, while preserving the
+	 * range and the vertical orientation of the node around its adjacent
+	 * content.
+	 *
+	 * The node's vertical orientation is preserved by inserting <br> elements
+	 * where needed.  The algorithm for doing so relies on the semantic property
+	 * of nodes rather than CSS because that would not work with trees that are
+	 * disconnected from the document.
+	 *
+	 * This function does not accomodate much of what a CSS render can do:
+	 * elements that are positioned using floating or relative or absolute
+	 * positioning, alignment, elements that are z-indexed or overlapping,
+	 * elements thar are transformed with CSS3.
+	 *
+	 * We may later want to consider what to do with the inevitable cases where
+	 * CSS effects layout (eg: the CSS "display" property).
+	 *
+	 * See discussion on standardizing innerHTML for more insight:
+	 * http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2011-February/030179.html
+	 *
+	 * Therefore, unwrapping the <p> elements in:
+	 * "<p>foo</p><p>bar</p>"
+	 * will yield:
+	 * foo<br/>bar
+	 *
+	 * @param {HTMLElement} node
+	 * @param {Range} range
+	 */
+	function unwrapNode(node, range) {
+		if (!node.parentNode || isEditingHost(node.parentNode)) {
+			return;
+		}
+		if (isBlock(node.parentNode)) {
+			unwrapBlockChild(node, range);
+		} else {
+			unwrapPreservingRange(node, range);
+		}
+	}
+
+	/**
+	 * Unwraps the a list of nodes while preserving the range, and vertical
+	 * orientation.
+	 *
+	 * @see unwrapNode()
+	 *
+	 * @param {Array.<HTMLElements>} nodes
+	 * @param {Range} range
+	 */
+	function unwrapNodes(nodes, range) {
+		var i;
+		for (i = 0; i < nodes.length; i++) {
+			unwrapNode(nodes[i], range);
+		}
+	}
+
 	return {
 		isControlCharacter: isControlCharacter,
 		isStyleInherited: isStyleInherited,
@@ -474,6 +1035,8 @@ define([
 		isProppedBlock: isProppedBlock,
 		isEditingHost: isEditingHost,
 		findNodeRight: findNodeRight,
-		allowNestedParagraph: allowNestedParagraph
+		allowNestedParagraph: allowNestedParagraph,
+		unwrapNode: unwrapNode,
+		unwrapNodes: unwrapNodes
 	};
 });
