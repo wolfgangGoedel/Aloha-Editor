@@ -50,8 +50,8 @@ define([
 	 * @param {function:boolean} predicate
 	 * @return {Array} Sub set of domain
 	 */
-	var filter = (function (native) {
-		return (native
+	var filter = (function (useNative) {
+		return (useNative
 			? function (domain, predicate) {
 				return domain.filter(predicate);
 			}
