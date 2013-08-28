@@ -153,10 +153,8 @@ define([
 	 * @return {jQuery.<HTMLElement>}
 	 */
 	function prepareClipboardHelper($target) {
-		var $newTarget = $('<p>');
-		$target.contents().remove();
-		$target.append($newTarget);
-		return $newTarget;
+		$target.text('');
+		return $target.contents();
 	}
 
 	/**
