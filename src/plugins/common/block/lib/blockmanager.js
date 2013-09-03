@@ -352,6 +352,10 @@ define([
 				editable.obj.data("block-dragdrop", that._dragdropEnabled);
 				that.createBlockLevelSortableForEditableOrBlockCollection(editable.obj);
 			});
+      Aloha.bind('aloha-editable-destroyed', function (e, editable) {
+        editable.obj.data("block-dragdrop", null);
+        that.destroyBlockLevelSortableForEditableOrBlockCollection(editable.obj);
+      });
 		},
 
 		/**
@@ -409,7 +413,19 @@ define([
 			}
 		},
 
-		/**
+    /**
+     * Removes sortable when editable is destroyed - clean up
+     *
+     * @param $editableOrBlockCollection
+     */
+    destroyBlockLevelSortableForEditableOrBlockCollection: function ($editableOrBlockCollection) {
+      if ($editableOrBlockCollection.hasClass('aloha-block-blocklevel-sortable')) {
+        $editableOrBlockCollection.removeClass("aloha-block-blocklevel-sortable").sortable("destroy");
+      }
+      //clean the IE hack too?
+    },
+
+    /**
 		 * Turn the dragdrop feature globally on or off.
 		 *
 		 * Will only affect editables created after this call is made.
