@@ -237,6 +237,7 @@ define([
 
 			// - IE7/8 Workaround
 			// - deletion of blocks inside block collection
+/*
 			jQuery(window.document).keydown(function (e) {
 				// Ignore events originating from the UI
 				if ($(e.target).closest('.aloha-ui').length > 0) {
@@ -263,6 +264,7 @@ define([
 					}
 				}
 			});
+*/
 		},
 
 		/**
