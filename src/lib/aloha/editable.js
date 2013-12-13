@@ -193,6 +193,9 @@ define([
 		});
 
 		$editable.keydown(function (event) {
+			if (jQuery(event.target).closest('.aloha-editable,.aloha-isolate').is('.aloha-isolate')) return true;
+
+
 			var letEventPass = Markup.preProcessKeyStrokes(event);
 			editable.keyCode = event.which;
 			if (!letEventPass) {
