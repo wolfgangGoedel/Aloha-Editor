@@ -2559,10 +2559,12 @@
 		// Obtaining a range from a selection
 		var selectionHasAnchorAndFocus = util.areHostObjects(testSelection, ["anchorNode", "focusNode"] && util.areHostProperties(testSelection, ["anchorOffset", "focusOffset"]));
 		api.features.selectionHasAnchorAndFocus = selectionHasAnchorAndFocus;
+		//api.features.selectionHasAnchorAndFocus = false; //manuel
 
 		// Test for existence of native selection extend() method
 		var selectionHasExtend = util.isHostMethod(testSelection, "extend");
 		api.features.selectionHasExtend = selectionHasExtend;
+		//api.features.selectionHasExtend = false; //manuel
 
 		// Test if rangeCount exists
 		var selectionHasRangeCount = (typeof testSelection.rangeCount == "number");
@@ -2613,7 +2615,9 @@
 		}
 
 		api.features.selectionSupportsMultipleRanges = selectionSupportsMultipleRanges;
+		//api.features.selectionSupportsMultipleRanges = false;
 		api.features.collapsedNonEditableSelectionsSupported = collapsedNonEditableSelectionsSupported;
+		//api.features.collapsedNonEditableSelectionsSupported = false;
 
 		// ControlRanges
 		var implementsControlRange = false,
@@ -2625,6 +2629,10 @@
 				implementsControlRange = true;
 			}
 		}
+
+		// TODO: Investigate why IE 10/11 crashes with this feature enabled, when trying to change tags/block markup.
+		// Disable for now!
+		implementsControlRange = false;
 		api.features.implementsControlRange = implementsControlRange;
 
 		// Selection collapsedness
@@ -2699,9 +2707,11 @@
 
 		function getSingleElementFromRange(range) {
 			var nodes = range.getNodes();
-			if (!rangeContainsSingleElement(nodes)) {
-				throw new Error("getSingleElementFromRange: range " + range.inspect() + " did not consist of a single element");
-			}
+			try {
+				if (!rangeContainsSingleElement(nodes)) {
+          			throw new Error("getSingleElementFromRange: range " + range.inspect() + " did not consist of a single element");
+        		}
+			} catch (e) {}
 			return nodes[0];
 		}
 

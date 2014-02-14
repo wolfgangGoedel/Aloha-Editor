@@ -88,7 +88,7 @@ define([
 	 * @type {jQuery.<HTMLElement>}
 	 * @const
 	 */
-	var $CLIPBOARD = $('<div style="position:absolute; ' +
+	var $CLIPBOARD = $('<div tabindex="-1" style="position:absolute; ' +
 	                   'clip:rect(0px,0px,0px,0px); ' +
 	                   'width:1px; height:1px;"></div>').contentEditable(true);
 

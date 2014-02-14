@@ -1158,7 +1158,10 @@ define([
 				if (isCollapsedAndEmptyOrEndBr(rangeObject)) {
 					var newMarkup = markupObject.clone();
 
-					if (isCollapsedAndEndBr(rangeObject)) {
+          			// Fixed this so the empty break is also added if the only child is a collapsed break element
+					if (isCollapsedAndEndBr(rangeObject) ||
+              			(rangeObject.startContainer.children.length > 0 &&
+               		 	 Engine.isEndBreak(rangeObject.startContainer.children[0]))) {
 						newMarkup[0].appendChild(Engine.createEndBreak());
 					}
 

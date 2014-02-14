@@ -69,7 +69,9 @@ define(['jquery', 'util/class', 'aloha/ecma5shims'], function (jQuery, Class, $_
 			'H4': true,
 			'H5': true,
 			'H6': true,
-			'LI': true
+			'LI': true,
+			'BLOCKQUOTE': true, // FIXED: missing block element names
+			'PRE': true
 		};
 
 	/**
